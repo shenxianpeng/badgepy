@@ -32,13 +32,13 @@ jobs:
           nox -f noxfile.py -s unit
 
   type-check:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.7'
+          python-version: '3.9'
       - run: |
           pip install virtualenv nox
           nox -f noxfile.py -s type_check
