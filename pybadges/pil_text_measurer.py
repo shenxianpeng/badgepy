@@ -35,5 +35,6 @@ class PilMeasurer(text_measurer.TextMeasurer):
 
     def text_width(self, text: str) -> float:
         """Returns the width, in pixels, of a string in DejaVu Sans 110pt."""
-        width, _ = self._font.getsize(text)
+        bbox = self._font.getbbox(text)
+        width = bbox[2] - bbox[0]  # Calculate the width from the bounding box
         return width
