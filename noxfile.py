@@ -46,8 +46,8 @@ def unit(session):
     [
         'Jinja2==3.0.0',
         'Pillow==8.3.2',  # Oldest version that supports Python 3.7 to 3.10.
-        'requests==2.22.0',
-        'urllib3<2.0.0',  # urllib3 2.0.0+ requires Python 3.8+
+        'requests>=2.25.0,<3.0.0',
+        'urllib3>=1.25.0,<2.0.0',  # urllib3 2.0.0+ requires Python 3.8+
         'xmldiff==2.4'
     ])
 def compatibility(session, install):
