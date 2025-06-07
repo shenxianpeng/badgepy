@@ -16,4 +16,5 @@ jobs:
           python-version: '3.12'
       - run: |
           pip install --upgrade setuptools wheel twine
-          bash twine_upload.sh
+          python3 setup.py sdist bdist_wheel
+          twine upload dist/* --username $PYPI_USERNAME --password $PYPI_PASSWORD
