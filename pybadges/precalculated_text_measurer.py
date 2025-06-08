@@ -76,14 +76,19 @@ class PrecalculatedTextMeasurer(text_measurer.TextMeasurer):
             return cls._default_cache
 
         try:
-            if importlib.resources.is_resource(__package__, 'default-widths.json.xz'):
-                with importlib.resources.open_binary(__package__, 'default-widths.json.xz') as f:
+            if importlib.resources.is_resource(__package__,
+                                               'default-widths.json.xz'):
+                with importlib.resources.open_binary(
+                        __package__, 'default-widths.json.xz') as f:
                     with lzma.open(f, "rt") as g:
                         cls._default_cache = PrecalculatedTextMeasurer.from_json(
                             cast(TextIO, g))
                         return cls._default_cache
-            elif importlib.resources.is_resource(__package__, 'default-widths.json'):
-                with importlib.resources.open_text(__package__, 'default-widths.json', encoding='utf-8') as f:
+            elif importlib.resources.is_resource(__package__,
+                                                 'default-widths.json'):
+                with importlib.resources.open_text(__package__,
+                                                   'default-widths.json',
+                                                   encoding='utf-8') as f:
                     cls._default_cache = PrecalculatedTextMeasurer.from_json(f)
                     return cls._default_cache
             else:

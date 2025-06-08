@@ -29,7 +29,7 @@ def lint(session):
     serious code quality issues.
     """
     session.install('yapf')
-    session.run('yapf', '--diff', '-r', '.', '--exclude', 'pybadges/imghdr.py')
+    session.run('yapf', '--diff', '-r', '.')
 
 
 @nox.session

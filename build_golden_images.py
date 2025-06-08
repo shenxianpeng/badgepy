@@ -47,13 +47,17 @@ def main():
     parser = argparse.ArgumentParser(
         description='generate a github-style badge given some text and colors')
 
-    with importlib.resources.as_file(importlib.resources.files('tests') / 'test-badges.json') as test_badges_path:
+    with importlib.resources.as_file(
+            importlib.resources.files('tests') /
+            'test-badges.json') as test_badges_path:
         parser.add_argument(
             '--source-path',
             default=str(test_badges_path),
             help='the text to show on the left-hand-side of the badge')
 
-    with importlib.resources.as_file(importlib.resources.files('tests') / 'golden-images') as golden_images_path:
+    with importlib.resources.as_file(
+            importlib.resources.files('tests') /
+            'golden-images') as golden_images_path:
         parser.add_argument(
             '--destination-dir',
             default=str(golden_images_path),
