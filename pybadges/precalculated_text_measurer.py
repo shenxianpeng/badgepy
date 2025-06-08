@@ -18,7 +18,8 @@ Uses a precalculated set of metrics to calculate the string length.
 
 import io
 import json
-import pkg_resources
+import importlib.resources
+import lzma
 from typing import cast, Mapping, TextIO, Type
 
 from pybadges import text_measurer
@@ -74,19 +75,18 @@ class PrecalculatedTextMeasurer(text_measurer.TextMeasurer):
         if cls._default_cache is not None:
             return cls._default_cache
 
-        if pkg_resources.resource_exists(__name__, 'default-widths.json.xz'):
-            import lzma
-            with pkg_resources.resource_stream(__name__,
-                                               'default-widths.json.xz') as f:
-                with lzma.open(f, "rt") as g:
-                    cls._default_cache = PrecalculatedTextMeasurer.from_json(
-                        cast(TextIO, g))
+        try:
+            if importlib.resources.is_resource(__package__, 'default-widths.json.xz'):
+                with importlib.resources.open_binary(__package__, 'default-widths.json.xz') as f:
+                    with lzma.open(f, "rt") as g:
+                        cls._default_cache = PrecalculatedTextMeasurer.from_json(
+                            cast(TextIO, g))
+                        return cls._default_cache
+            elif importlib.resources.is_resource(__package__, 'default-widths.json'):
+                with importlib.resources.open_text(__package__, 'default-widths.json', encoding='utf-8') as f:
+                    cls._default_cache = PrecalculatedTextMeasurer.from_json(f)
                     return cls._default_cache
-        elif pkg_resources.resource_exists(__name__, 'default-widths.json'):
-            with pkg_resources.resource_stream(__name__,
-                                               'default-widths.json') as f:
-                cls._default_cache = PrecalculatedTextMeasurer.from_json(
-                    io.TextIOWrapper(f, encoding='utf-8'))
-                return cls._default_cache
-        else:
-            raise ValueError('could not load default-widths.json')
+            else:
+                raise ValueError('could not load default-widths.json')
+        except Exception as e:
+            raise ValueError(f'Error loading default-widths.json: {e}')

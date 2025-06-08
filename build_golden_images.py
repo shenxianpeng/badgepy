@@ -19,6 +19,7 @@ import json
 import os
 import os.path
 import pkg_resources
+import importlib.resources
 
 import pybadges
 from tests import image_server
@@ -46,17 +47,18 @@ def main():
     parser = argparse.ArgumentParser(
         description='generate a github-style badge given some text and colors')
 
-    parser.add_argument(
-        '--source-path',
-        default=pkg_resources.resource_filename(__name__,
-                                                'tests/test-badges.json'),
-        help='the text to show on the left-hand-side of the badge')
+    with importlib.resources.as_file(importlib.resources.files('tests') / 'test-badges.json') as test_badges_path:
+        parser.add_argument(
+            '--source-path',
+            default=str(test_badges_path),
+            help='the text to show on the left-hand-side of the badge')
 
-    parser.add_argument(
-        '--destination-dir',
-        default=pkg_resources.resource_filename(__name__,
-                                                'tests/golden-images'),
-        help='the text to show on the left-hand-side of the badge')
+    with importlib.resources.as_file(importlib.resources.files('tests') / 'golden-images') as golden_images_path:
+        parser.add_argument(
+            '--destination-dir',
+            default=str(golden_images_path),
+            help='the text to show on the left-hand-side of the badge')
+
     args = parser.parse_args()
     generate_images(args.source_path, args.destination_dir)
 
