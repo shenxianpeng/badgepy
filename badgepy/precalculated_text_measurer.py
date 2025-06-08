@@ -22,7 +22,7 @@ import importlib.resources
 import lzma
 from typing import cast, Mapping, TextIO, Type
 
-from pybadges import text_measurer
+from badgepy import text_measurer
 
 
 class PrecalculatedTextMeasurer(text_measurer.TextMeasurer):
@@ -30,9 +30,12 @@ class PrecalculatedTextMeasurer(text_measurer.TextMeasurer):
 
     _default_cache = None
 
-    def __init__(self, default_character_width: float,
-                 char_to_width: Mapping[str, float],
-                 pair_to_kern: Mapping[str, float]):
+    def __init__(
+        self,
+        default_character_width: float,
+        char_to_width: Mapping[str, float],
+        pair_to_kern: Mapping[str, float],
+    ):
         """Initializer for PrecalculatedTextMeasurer.
 
         Args:
@@ -54,44 +57,44 @@ class PrecalculatedTextMeasurer(text_measurer.TextMeasurer):
         width = 0
         for index, c in enumerate(text):
             width += self._char_to_width.get(c, self._default_character_width)
-            width -= self._pair_to_kern.get(text[index:index + 2], 0)
+            width -= self._pair_to_kern.get(text[index : index + 2], 0)
 
         return width
 
     @staticmethod
-    def from_json(f: TextIO) -> 'PrecalculatedTextMeasurer':
+    def from_json(f: TextIO) -> "PrecalculatedTextMeasurer":
         """Return a PrecalculatedTextMeasurer given a JSON stream.
 
         See precalculate_text.py for details on the required format.
         """
         o = json.load(f)
-        return PrecalculatedTextMeasurer(o['mean-character-length'],
-                                         o['character-lengths'],
-                                         o['kerning-pairs'])
+        return PrecalculatedTextMeasurer(
+            o["mean-character-length"], o["character-lengths"], o["kerning-pairs"]
+        )
 
     @classmethod
-    def default(cls) -> 'PrecalculatedTextMeasurer':
+    def default(cls) -> "PrecalculatedTextMeasurer":
         """Returns a reasonable default PrecalculatedTextMeasurer."""
         if cls._default_cache is not None:
             return cls._default_cache
 
         try:
-            if importlib.resources.is_resource(__package__,
-                                               'default-widths.json.xz'):
+            if importlib.resources.is_resource(__package__, "default-widths.json.xz"):
                 with importlib.resources.open_binary(
-                        __package__, 'default-widths.json.xz') as f:
+                    __package__, "default-widths.json.xz"
+                ) as f:
                     with lzma.open(f, "rt") as g:
                         cls._default_cache = PrecalculatedTextMeasurer.from_json(
-                            cast(TextIO, g))
+                            cast(TextIO, g)
+                        )
                         return cls._default_cache
-            elif importlib.resources.is_resource(__package__,
-                                                 'default-widths.json'):
-                with importlib.resources.open_text(__package__,
-                                                   'default-widths.json',
-                                                   encoding='utf-8') as f:
+            elif importlib.resources.is_resource(__package__, "default-widths.json"):
+                with importlib.resources.open_text(
+                    __package__, "default-widths.json", encoding="utf-8"
+                ) as f:
                     cls._default_cache = PrecalculatedTextMeasurer.from_json(f)
                     return cls._default_cache
             else:
-                raise ValueError('could not load default-widths.json')
+                raise ValueError("could not load default-widths.json")
         except Exception as e:
-            raise ValueError(f'Error loading default-widths.json: {e}')
+            raise ValueError(f"Error loading default-widths.json: {e}")

@@ -5,7 +5,7 @@ This is a simple example of how a
 
 ### Installing
 
-Before running the server, you must install Flask and pybadges. You can install both with:
+Before running the server, you must install Flask and badgepy. You can install both with:
 
 ```sh
 pip install -r requirements.txt

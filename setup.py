@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""A setup module for pybadges."""
+"""A setup module for badgepy."""
 
 import base64
 import re
@@ -25,60 +25,60 @@ def get_long_description():
     Replaces relative references to svg images to absolute https references.
     """
 
-    with open('README.md') as f:
+    with open("README.md") as f:
         read_me = f.read()
 
     def replace_relative_with_absolute(match):
         svg_path = match.group(0)[1:-1]
-        return ('(https://github.com/google/pybadges/raw/master/'
-                '%s?sanitize=true)' % svg_path)
+        return (
+            "(https://github.com/shenxianpeng/badgepy/raw/master/"
+            "%s?sanitize=true)" % svg_path
+        )
 
-    return re.sub(r'\(tests/golden-images/.*?\.svg\)',
-                  replace_relative_with_absolute, read_me)
+    return re.sub(
+        r"\(tests/golden-images/.*?\.svg\)", replace_relative_with_absolute, read_me
+    )
 
 
 setup(
-    name='pybadges',
-    version='3.0.1',  # Also change in version.py.
-    author='Brian Quinlan',
-    author_email='brian@sweetapp.com',
+    name="badgepy",
+    version="1.0.0",  # Also change in version.py.
+    author="Brian Quinlan",
+    author_email="brian@sweetapp.com",
     classifiers=[
-        'Development Status :: 5 - Production/Stable',
-        'Intended Audience :: Developers',
-        'Intended Audience :: Developers',
-        'License :: OSI Approved :: Apache Software License',
-        'Programming Language :: Python :: 3.9',
-        'Programming Language :: Python :: 3.10',
-        'Programming Language :: Python :: 3.11',
-        'Programming Language :: Python :: 3.12',
-        'Programming Language :: Python :: 3.13',
-        'Operating System :: OS Independent',
+        "Development Status :: 5 - Production/Stable",
+        "Intended Audience :: Developers",
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: Apache Software License",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
+        "Programming Language :: Python :: 3.13",
+        "Operating System :: OS Independent",
     ],
-    description='A library and command-line tool for generating Github-style ' +
-    'badges',
+    description="A library and command-line tool for generating Github-style "
+    + "badges",
     keywords="github gh-badges badge shield status",
     package_data={
-        'pybadges': [
-            'badge-template-full.svg', 'default-widths.json', 'py.typed'
-        ]
+        "badgepy": ["badge-template-full.svg", "default-widths.json", "py.typed"]
     },
     long_description=get_long_description(),
-    long_description_content_type='text/markdown',
-    python_requires='>=3.9',
-    install_requires=[
-        'Jinja2>=3,<4', 'requests>=2.22.0,<3', 'filetype>=1.2.0,<2.0.0'
-    ],
+    long_description_content_type="text/markdown",
+    python_requires=">=3.9",
+    install_requires=["Jinja2>=3,<4", "requests>=2.22.0,<3", "filetype>=1.2.0,<2.0.0"],
     extras_require={
-        'pil-measurement': ['Pillow>=6,<10'],
-        'dev': [
-            'Flask>=2.0',  # For server tests. 
-            'fonttools>=3.26',
-            'nox',
-            'Pillow>=5',
-            'pytest>=3.6',
-            'xmldiff>=2.4'
+        "pil-measurement": ["Pillow>=6,<10"],
+        "dev": [
+            "Flask>=2.0",  # For server tests.
+            "fonttools>=3.26",
+            "nox",
+            "Pillow>=5",
+            "pytest>=3.6",
+            "xmldiff>=2.4",
         ],
     },
-    license='Apache-2.0',
-    packages=["pybadges"],
-    url='https://github.com/google/pybadges')
+    license="Apache-2.0",
+    packages=["badgepy"],
+    url="https://github.com/shenxianpeng/badgepy",
+)

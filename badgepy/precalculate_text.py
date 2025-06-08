@@ -37,7 +37,7 @@ The output JSON object is formatted like:
 }
 
 For information about the commands, run:
-$ python3 - m pybadges.precalculate_text --help
+$ python3 - m badgepy.precalculate_text --help
 """
 
 import argparse
@@ -49,21 +49,22 @@ from typing import Iterable, Mapping, TextIO
 
 from fontTools import ttLib
 
-from pybadges import pil_text_measurer
-from pybadges import text_measurer
+from badgepy import pil_text_measurer
+from badgepy import text_measurer
 
 
 def generate_supported_characters(deja_vu_sans_path: str) -> Iterable[str]:
     """Generate the characters support by the font at the given path."""
     font = ttLib.TTFont(deja_vu_sans_path)
-    for cmap in font['cmap'].tables:
+    for cmap in font["cmap"].tables:
         if cmap.isUnicode():
             for code in cmap.cmap:
                 yield chr(code)
 
 
-def generate_encodeable_characters(characters: Iterable[str],
-                                   encodings: Iterable[str]) -> Iterable[str]:
+def generate_encodeable_characters(
+    characters: Iterable[str], encodings: Iterable[str]
+) -> Iterable[str]:
     """Generates the subset of 'characters' that can be encoded by 'encodings'.
 
     Args:
@@ -84,8 +85,8 @@ def generate_encodeable_characters(characters: Iterable[str],
 
 
 def calculate_character_to_length_mapping(
-        measurer: text_measurer.TextMeasurer,
-        characters: Iterable[str]) -> Mapping[str, float]:
+    measurer: text_measurer.TextMeasurer, characters: Iterable[str]
+) -> Mapping[str, float]:
     """Return a mapping between each given character and its length.
 
     Args:
@@ -104,9 +105,11 @@ def calculate_character_to_length_mapping(
     return char_to_length
 
 
-def calculate_pair_to_kern_mapping(measurer: text_measurer.TextMeasurer,
-                                   char_to_length: Mapping[str, float],
-                                   characters: str) -> Mapping[str, float]:
+def calculate_pair_to_kern_mapping(
+    measurer: text_measurer.TextMeasurer,
+    char_to_length: Mapping[str, float],
+    characters: str,
+) -> Mapping[str, float]:
     """Returns a mapping between each *pair* of characters and their kerning.
 
     Args:
@@ -137,69 +140,79 @@ def calculate_pair_to_kern_mapping(measurer: text_measurer.TextMeasurer,
     return pair_to_kerning
 
 
-def write_json(f: TextIO, deja_vu_sans_path: str,
-               measurer: text_measurer.TextMeasurer,
-               encodings: Iterable[str]) -> None:
+def write_json(
+    f: TextIO,
+    deja_vu_sans_path: str,
+    measurer: text_measurer.TextMeasurer,
+    encodings: Iterable[str],
+) -> None:
     """Write the data required by PrecalculatedTextMeasurer to a stream."""
-    supported_characters = list(
-        generate_supported_characters(deja_vu_sans_path))
-    kerning_characters = ''.join(
-        generate_encodeable_characters(supported_characters, encodings))
+    supported_characters = list(generate_supported_characters(deja_vu_sans_path))
+    kerning_characters = "".join(
+        generate_encodeable_characters(supported_characters, encodings)
+    )
     char_to_length = calculate_character_to_length_mapping(
-        measurer, supported_characters)
-    pair_to_kerning = calculate_pair_to_kern_mapping(measurer, char_to_length,
-                                                     kerning_characters)
+        measurer, supported_characters
+    )
+    pair_to_kerning = calculate_pair_to_kern_mapping(
+        measurer, char_to_length, kerning_characters
+    )
     json.dump(
         {
-            'mean-character-length': statistics.mean(char_to_length.values()),
-            'character-lengths': char_to_length,
-            'kerning-characters': kerning_characters,
-            'kerning-pairs': pair_to_kerning
+            "mean-character-length": statistics.mean(char_to_length.values()),
+            "character-lengths": char_to_length,
+            "kerning-characters": kerning_characters,
+            "kerning-pairs": pair_to_kerning,
         },
         f,
         sort_keys=True,
-        indent=1)
+        indent=1,
+    )
 
 
 def main():
     parser = argparse.ArgumentParser(
-        description='generate a github-style badge given some text and colors')
+        description="generate a github-style badge given some text and colors"
+    )
 
     parser.add_argument(
-        '--deja-vu-sans-path',
+        "--deja-vu-sans-path",
         required=True,
-        help='the path to the ttf font file containing DejaVu Sans. If not ' +
-        'present on your system, you can download it from ' +
-        'https://www.fontsquirrel.com/fonts/dejavu-sans')
+        help="the path to the ttf font file containing DejaVu Sans. If not "
+        + "present on your system, you can download it from "
+        + "https://www.fontsquirrel.com/fonts/dejavu-sans",
+    )
 
     parser.add_argument(
-        '--kerning-pair-encodings',
-        action='append',
-        default=['cp1252'],
-        help='only include kerning pairs for the given encodings')
+        "--kerning-pair-encodings",
+        action="append",
+        default=["cp1252"],
+        help="only include kerning pairs for the given encodings",
+    )
 
     parser.add_argument(
-        '--output-json-file',
-        default=os.path.join(os.path.dirname(__file__), 'default-widths.json'),
-        help='the path where the generated JSON will be placed. If the ' +
-        'provided filename extension ends with .xz then the output' +
-        'will be compressed using lzma.')
+        "--output-json-file",
+        default=os.path.join(os.path.dirname(__file__), "default-widths.json"),
+        help="the path where the generated JSON will be placed. If the "
+        + "provided filename extension ends with .xz then the output"
+        + "will be compressed using lzma.",
+    )
 
     args = parser.parse_args()
 
     measurer = pil_text_measurer.PilMeasurer(args.deja_vu_sans_path)
 
     def create_file():
-        if args.output_json_file.endswith('.xz'):
+        if args.output_json_file.endswith(".xz"):
             import lzma
-            return lzma.open(args.output_json_file, 'wt')
+
+            return lzma.open(args.output_json_file, "wt")
         else:
-            return open(args.output_json_file, 'wt')
+            return open(args.output_json_file, "wt")
 
     with create_file() as f:
-        write_json(f, args.deja_vu_sans_path, measurer,
-                   args.kerning_pair_encodings)
+        write_json(f, args.deja_vu_sans_path, measurer, args.kerning_pair_encodings)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
