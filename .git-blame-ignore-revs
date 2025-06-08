@@ -1,0 +1,5 @@
+# This is a git-blame-ignore-revs file.
+# It contains a list of commit hashes that should be ignored when using git blame.
+
+# ignore commit for change formatting tool
+ed881e89913703280aee44fc8dddf08226d49662
