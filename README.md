@@ -1,11 +1,12 @@
-[![CI](https://github.com/shenxianpeng/pybadges/actions/workflows/ci.yml/badge.svg)](https://github.com/shenxianpeng/pybadges/actions/workflows/ci.yml)
-![pypi](https://img.shields.io/pypi/v/pybadges.svg)
-![versions](https://img.shields.io/pypi/pyversions/pybadges.svg)
+[![CI](https://github.com/shenxianpeng/badgepy/actions/workflows/ci.yml/badge.svg)](https://github.com/shenxianpeng/badgepy/actions/workflows/ci.yml)
+![pypi](https://img.shields.io/pypi/v/badgepy.svg)
+![versions](https://img.shields.io/pypi/pyversions/badgepy.svg)
    
-# pybadges
+# badgepy
 
-pybadges is a Python library and command line tool that allows you to create
-Github-style badges as SVG images. For example:
+> **badgepy** is a fork of [google/pybadges](https://github.com/google/pybadges) with fixes including Python 3.13 support, dropped Python 3.7/3.8 support, removal of deprecated `imghdr`, and replacement of `pkg_resources`. This project is actively maintained.
+
+badgepy is a Python library and command line tool that allows you to create Github-style badges as SVG images. For example:
 
 ![pip installation](tests/golden-images/pip.svg)
 ![pip installation](tests/golden-images/license.svg)
@@ -22,15 +23,15 @@ The implementation of the library was heavily influenced by
 
 ### Installing
 
-pybadges can be installed using [pip](https://pypi.org/project/pip/):
+badgepy can be installed using [pip](https://pypi.org/project/pip/):
 
 ```sh
-pip install pybadges
+pip install badgepy
 ```
 
 To test that installation was successful, try:
 ```sh
-python -m pybadges --left-text=build --right-text=failure --right-color='#c00' --browser
+python -m badgepy --left-text=build --right-text=failure --right-color='#c00' --browser
 ```
 
 You will see a badge like this in your browser:
@@ -39,25 +40,25 @@ You will see a badge like this in your browser:
 
 ## Usage
 
-pybadges can be used both from the command line and as a Python library.
+badgepy can be used both from the command line and as a Python library.
 
 The command line interface is a great way to experiment with the API before
 writing Python code.
 
-You could also look at the [example server](https://github.com/google/pybadges/tree/master/server-example).
+You could also look at the [example server](https://github.com/shenxianpeng/badgepy/tree/master/server-example).
 
 ### Command line usage
 
-Complete documentation of pybadges command arguments can be found using the `--help`
+Complete documentation of badgepy command arguments can be found using the `--help`
 flag:
 
 ```sh
-python -m pybadges --help
+python -m badgepy --help
 ```
 
 But the following usage demonstrates every interesting option:
 ```sh
-python -m pybadges \
+python -m badgepy \
     --left-text=complete \
     --right-text=example \
     --left-color=green \
@@ -79,7 +80,7 @@ python -m pybadges \
 Note that the `--logo` option can include a regular URL:
 
 ```sh
-python -m pybadges \
+python -m badgepy \
     --left-text="python" \
     --right-text="3.2, 3.3, 3.4, 3.5, 3.6" \
     --whole-link="https://www.python.org/" \
@@ -110,10 +111,10 @@ but is currently
 
 ### Library usage
 
-pybadges is primarily meant to be used as a Python library.
+badgepy is primarily meant to be used as a Python library.
 
 ```python
-from pybadges import badge
+from badgepy import badge
 s = badge(left_text='coverage', right_text='23%', right_color='red')
 # s is a string that contains the badge data as an svg image.
 print(s[:40]) # => <svg height="20" width="191.0" xmlns="ht
@@ -125,15 +126,15 @@ hyphen/minus (e.g. `--left-text` => `left_text=`)
 
 #### Server usage
 
-pybadges can be used to serve badge images on the web. 
+badgepy can be used to serve badge images on the web. 
 
-[server-example](https://github.com/google/pybadges/tree/master/server-example)
+[server-example](https://github.com/shenxianpeng/badgepy/tree/master/server-example)
 contains an example of serving badge images from a
 [Flask server](https://flask.palletsprojects.com/).
 
 ### Caveats
 
- - pybadges uses a pre-calculated table of text widths and
+ - badgepy uses a pre-calculated table of text widths and
    [kerning](https://en.wikipedia.org/wiki/Kerning) distances
    (for western glyphs) to determine the size of the badge.
    So Eastern European languages may be rendered less well than
@@ -146,7 +147,7 @@ contains an example of serving badge images from a
 
     ![pip installation](tests/golden-images/saying-chinese.svg)
 
- - pybadges does not have any explicit support for languages that
+ - badgepy does not have any explicit support for languages that
    are written right-to-left (e.g. Arabic, Hebrew) and the displayed
    text direction may be incorrect:
 
@@ -155,8 +156,8 @@ contains an example of serving badge images from a
 ## Development
 
 ```sh
-git clone https://github.com/google/pybadges.git
-cd pybadges
+git clone https://github.com/shenxianpeng/badgepy.git
+cd badgepy
 python -m virtualenv venv
 source venv/bin/activate
 # Installs in edit mode and with development dependencies.
@@ -164,7 +165,7 @@ pip install -e .[dev]
 nox
 ```
 
-If you'd like to contribute your changes back to pybadges, please read the
+If you'd like to contribute your changes back to badgepy, please read the
 [contributor guide.](CONTRIBUTING.md)
 
 ## Versioning
@@ -174,5 +175,3 @@ We use [SemVer](http://semver.org/) for versioning.
 ## License
 
 This project is licensed under the Apache License - see the [LICENSE](LICENSE) file for details
-
-This is not an officially supported Google product.

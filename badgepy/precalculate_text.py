@@ -37,7 +37,7 @@ The output JSON object is formatted like:
 }
 
 For information about the commands, run:
-$ python3 - m pybadges.precalculate_text --help
+$ python3 - m badgepy.precalculate_text --help
 """
 
 import argparse
@@ -49,8 +49,8 @@ from typing import Iterable, Mapping, TextIO
 
 from fontTools import ttLib
 
-from pybadges import pil_text_measurer
-from pybadges import text_measurer
+from badgepy import pil_text_measurer
+from badgepy import text_measurer
 
 
 def generate_supported_characters(deja_vu_sans_path: str) -> Iterable[str]:

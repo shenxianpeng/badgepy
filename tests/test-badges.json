@@ -56,7 +56,7 @@
   {
     "file_name": "github.svg",
     "left_text": "github",
-    "right_text": "pybadges",
+    "right_text": "badgepy",
     "right_color": "blue",
     "whole_link": "TODO"
   },
@@ -71,10 +71,10 @@
   {
     "file_name": "pip.svg",
     "left_text": "pip install",
-    "right_text": "pybadges",
+    "right_text": "badgepy",
     "right_color": "blue",
     "left_link": "https://pip.pypa.io/en/stable/installing/",
-    "right_link": "https://pypi.org/project/pybadges/"
+    "right_link": "https://pypi.org/project/badgepy/"
   },
   {
     "file_name": "python.svg",

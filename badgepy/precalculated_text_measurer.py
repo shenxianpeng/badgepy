@@ -22,7 +22,7 @@ import importlib.resources
 import lzma
 from typing import cast, Mapping, TextIO, Type
 
-from pybadges import text_measurer
+from badgepy import text_measurer
 
 
 class PrecalculatedTextMeasurer(text_measurer.TextMeasurer):

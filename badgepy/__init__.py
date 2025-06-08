@@ -39,14 +39,14 @@ import filetype
 import jinja2
 import requests
 
-from pybadges import text_measurer
-from pybadges import precalculated_text_measurer
-from pybadges.version import __version__
+from badgepy import text_measurer
+from badgepy import precalculated_text_measurer
+from badgepy.version import __version__
 
 _JINJA2_ENVIRONMENT = jinja2.Environment(
     trim_blocks=True,
     lstrip_blocks=True,
-    loader=jinja2.PackageLoader('pybadges', '.'),
+    loader=jinja2.PackageLoader('badgepy', '.'),
     autoescape=jinja2.select_autoescape(['svg']))
 
 # Use the same color scheme as describe in:

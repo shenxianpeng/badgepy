@@ -14,7 +14,7 @@
 """ Example Flask server that serves badges."""
 
 import flask
-import pybadges
+import badgepy
 
 app = flask.Flask(__name__)
 
@@ -57,7 +57,7 @@ def index():
 @app.route('/img')
 def serve_badge():
     """Serve a badge image based on the request query string."""
-    badge = pybadges.badge(left_text=flask.request.args.get('left_text'),
+    badge = badgepy.badge(left_text=flask.request.args.get('left_text'),
                            right_text=flask.request.args.get('right_text'),
                            left_color=flask.request.args.get('left_color'),
                            right_color=flask.request.args.get('right_color'),

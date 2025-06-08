@@ -20,13 +20,13 @@ import os
 import os.path
 import importlib.resources
 
-import pybadges
+import badgepy
 from tests import image_server
-from tests import test_pybadges
+from tests import test_badgepy
 
 
 def generate_images(source_json_path, target_directory):
-    srv = image_server.ImageServer(test_pybadges.PNG_IMAGE)
+    srv = image_server.ImageServer(test_badgepy.PNG_IMAGE)
     srv.start_server()
     try:
         os.makedirs(target_directory, exist_ok=True)
@@ -37,7 +37,7 @@ def generate_images(source_json_path, target_directory):
             srv.fix_embedded_url_reference(example)
             filename = os.path.join(target_directory, example.pop('file_name'))
             with open(filename, 'w', encoding='utf-8') as f:
-                f.write(pybadges.badge(**example))
+                f.write(badgepy.badge(**example))
     finally:
         srv.stop_server()
 

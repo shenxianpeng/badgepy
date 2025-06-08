@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""A setup module for pybadges."""
+"""A setup module for badgepy."""
 
 import base64
 import re
@@ -30,7 +30,7 @@ def get_long_description():
 
     def replace_relative_with_absolute(match):
         svg_path = match.group(0)[1:-1]
-        return ('(https://github.com/google/pybadges/raw/master/'
+        return ('(https://github.com/shenxianpeng/badgepy/raw/master/'
                 '%s?sanitize=true)' % svg_path)
 
     return re.sub(r'\(tests/golden-images/.*?\.svg\)',
@@ -38,8 +38,8 @@ def get_long_description():
 
 
 setup(
-    name='pybadges',
-    version='3.0.1',  # Also change in version.py.
+    name='badgepy',
+    version='1.0.0',  # Also change in version.py.
     author='Brian Quinlan',
     author_email='brian@sweetapp.com',
     classifiers=[
@@ -58,7 +58,7 @@ setup(
     'badges',
     keywords="github gh-badges badge shield status",
     package_data={
-        'pybadges': [
+        'badgepy': [
             'badge-template-full.svg', 'default-widths.json', 'py.typed'
         ]
     },
@@ -80,5 +80,5 @@ setup(
         ],
     },
     license='Apache-2.0',
-    packages=["pybadges"],
-    url='https://github.com/google/pybadges')
+    packages=["badgepy"],
+    url='https://github.com/shenxianpeng/badgepy')
