@@ -65,7 +65,9 @@ setup(
     long_description=get_long_description(),
     long_description_content_type='text/markdown',
     python_requires='>=3.9',
-    install_requires=['Jinja2>=3,<4', 'requests>=2.22.0,<3', 'filetype>=1.2.0,<2.0.0'],
+    install_requires=[
+        'Jinja2>=3,<4', 'requests>=2.22.0,<3', 'filetype>=1.2.0,<2.0.0'
+    ],
     extras_require={
         'pil-measurement': ['Pillow>=6,<10'],
         'dev': [
