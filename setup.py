@@ -47,14 +47,11 @@ setup(
         'Intended Audience :: Developers',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: Apache Software License',
-        'Programming Language :: Python',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
         'Programming Language :: Python :: 3.11',
         'Programming Language :: Python :: 3.12',
+        'Programming Language :: Python :: 3.13',
         'Operating System :: OS Independent',
     ],
     description='A library and command-line tool for generating Github-style ' +
@@ -67,8 +64,10 @@ setup(
     },
     long_description=get_long_description(),
     long_description_content_type='text/markdown',
-    python_requires='>=3.4',
-    install_requires=['Jinja2>=3,<4', 'requests>=2.22.0,<3'],
+    python_requires='>=3.9',
+    install_requires=[
+        'Jinja2>=3,<4', 'requests>=2.22.0,<3', 'filetype>=1.2.0,<2.0.0'
+    ],
     extras_require={
         'pil-measurement': ['Pillow>=6,<10'],
         'dev': [

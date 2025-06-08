@@ -30,12 +30,12 @@ gh-badges library
 """
 
 import base64
-import imghdr
 import mimetypes
 from typing import Optional
 import urllib.parse
 from xml.dom import minidom
 
+import filetype
 import jinja2
 import requests
 
@@ -102,7 +102,8 @@ def _embed_image(url: str) -> str:
     else:
         with open(url, 'rb') as f:
             image_data = f.read()
-        image_type = imghdr.what(None, image_data)
+        kind = filetype.guess(image_data)
+        image_type = kind.extension if kind is not None else None
         if not image_type:
             mime_type, _ = mimetypes.guess_type(url, strict=False)
             if not mime_type:
