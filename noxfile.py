@@ -18,52 +18,49 @@ import sys
 
 
 def _run_tests(session):
-    session.run('py.test', '--quiet', 'tests', 'server-example',
-                *session.posargs)
+    session.run("py.test", "--quiet", "tests", "server-example", *session.posargs)
 
 
 @nox.session
 def lint(session):
-    """Run flake8.
-    Returns a failure if flake8 finds linting errors or sufficiently
-    serious code quality issues.
-    """
-    session.install('yapf')
-    session.run('yapf', '--diff', '-r', '.')
+    """Run ruff"""
+    """Run the linter."""
+    session.install("ruff")
+    session.run("ruff", "format", "badgepy", "tests", "server-example", *session.posargs)
 
 
 @nox.session
 def unit(session):
     """Run the unit test suite."""
-    session.install('-e', '.[dev]')
-    session.install('flask')
+    session.install("-e", ".[dev]")
+    session.install("flask")
     _run_tests(session)
 
 
 @nox.session
 @nox.parametrize(
-    'install',
+    "install",
     [
-        'Jinja2==3.0.0',
-        'Pillow>=11.2.1,<12.0.0',
-        'requests>=2.25.0,<3.0.0',
-        'urllib3>=1.25.0,<2.0.0',  # urllib3 2.0.0+ requires Python 3.8+
-        'xmldiff==2.4'
-    ])
+        "Jinja2==3.0.0",
+        "Pillow>=11.2.1,<12.0.0",
+        "requests>=2.25.0,<3.0.0",
+        "urllib3>=1.25.0,<2.0.0",  # urllib3 2.0.0+ requires Python 3.8+
+        "xmldiff==2.4",
+    ],
+)
 def compatibility(session, install):
     """Run the unit test suite with each support library and Python version."""
     session.install(install)
-    session.install('-r', 'server-example/requirements-test.txt')
-    session.install('-e', '.[dev]')
+    session.install("-r", "server-example/requirements-test.txt")
+    session.install("-e", ".[dev]")
     _run_tests(session)
 
 
-@nox.session(python=['3.12'])
+@nox.session(python=["3.12"])
 def type_check(session):
     """Run type checking using pytype."""
-    if sys.platform.startswith('win'):
-        session.skip('pytype not supported on Windows')
-    session.install('-e', '.[dev]')
-    session.install('pytype')
-    session.run('pytype', '--python-version=3.12', '--disable=pyi-error',
-                'badgepy')
+    if sys.platform.startswith("win"):
+        session.skip("pytype not supported on Windows")
+    session.install("-e", ".[dev]")
+    session.install("pytype")
+    session.run("pytype", "--python-version=3.12", "--disable=pyi-error", "badgepy")

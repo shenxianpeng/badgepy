@@ -41,34 +41,34 @@ import requests
 
 from badgepy import text_measurer
 from badgepy import precalculated_text_measurer
-from badgepy.version import __version__
 
 _JINJA2_ENVIRONMENT = jinja2.Environment(
     trim_blocks=True,
     lstrip_blocks=True,
-    loader=jinja2.PackageLoader('badgepy', '.'),
-    autoescape=jinja2.select_autoescape(['svg']))
+    loader=jinja2.PackageLoader("badgepy", "."),
+    autoescape=jinja2.select_autoescape(["svg"]),
+)
 
 # Use the same color scheme as describe in:
 # https://github.com/badges/shields/blob/master/lib/colorscheme.json
 
 _NAME_TO_COLOR = {
-    'brightgreen': '#4c1',
-    'green': '#97CA00',
-    'yellow': '#dfb317',
-    'yellowgreen': '#a4a61d',
-    'orange': '#fe7d37',
-    'red': '#e05d44',
-    'blue': '#007ec6',
-    'grey': '#555',
-    'gray': '#555',
-    'lightgrey': '#9f9f9f',
-    'lightgray': '#9f9f9f',
-    'critical': '#e05d44',
-    'important': '#fe7d37',
-    'success': '#4c1',
-    'informational': '#007ec6',
-    'inactive': '#9f9f9f',
+    "brightgreen": "#4c1",
+    "green": "#97CA00",
+    "yellow": "#dfb317",
+    "yellowgreen": "#a4a61d",
+    "orange": "#fe7d37",
+    "red": "#e05d44",
+    "blue": "#007ec6",
+    "grey": "#555",
+    "gray": "#555",
+    "lightgrey": "#9f9f9f",
+    "lightgray": "#9f9f9f",
+    "critical": "#e05d44",
+    "important": "#fe7d37",
+    "success": "#4c1",
+    "informational": "#007ec6",
+    "inactive": "#9f9f9f",
 }
 
 
@@ -84,38 +84,38 @@ def _remove_blanks(node):
 def _embed_image(url: str) -> str:
     parsed_url = urllib.parse.urlparse(url)
 
-    if parsed_url.scheme == 'data':
+    if parsed_url.scheme == "data":
         return url
-    elif parsed_url.scheme.startswith('http'):
+    elif parsed_url.scheme.startswith("http"):
         r = requests.get(url)
         r.raise_for_status()
-        content_type = r.headers.get('content-type')
+        content_type = r.headers.get("content-type")
         if content_type is None:
             raise ValueError('no "Content-Type" header')
-        content_type, image_type = content_type.split('/')
-        if content_type != 'image':
-            raise ValueError(
-                'expected an image, got "{0}"'.format(content_type))
+        content_type, image_type = content_type.split("/")
+        if content_type != "image":
+            raise ValueError('expected an image, got "{0}"'.format(content_type))
         image_data = r.content
     elif parsed_url.scheme:
         raise ValueError('unsupported scheme "{0}"'.format(parsed_url.scheme))
     else:
-        with open(url, 'rb') as f:
+        with open(url, "rb") as f:
             image_data = f.read()
         kind = filetype.guess(image_data)
         image_type = kind.extension if kind is not None else None
         if not image_type:
             mime_type, _ = mimetypes.guess_type(url, strict=False)
             if not mime_type:
-                raise ValueError('not able to determine file type')
+                raise ValueError("not able to determine file type")
             else:
-                content_type, image_type = mime_type.split('/')
-                if content_type != 'image':
-                    raise ValueError('expected an image, got "{0}"'.format(
-                        content_type or 'unknown'))
+                content_type, image_type = mime_type.split("/")
+                if content_type != "image":
+                    raise ValueError(
+                        'expected an image, got "{0}"'.format(content_type or "unknown")
+                    )
 
-    encoded_image = base64.b64encode(image_data).decode('ascii')
-    return 'data:image/{};base64,{}'.format(image_type, encoded_image)
+    encoded_image = base64.b64encode(image_data).decode("ascii")
+    return "data:image/{};base64,{}".format(image_type, encoded_image)
 
 
 def badge(
@@ -126,8 +126,8 @@ def badge(
     center_link: Optional[str] = None,
     whole_link: Optional[str] = None,
     logo: Optional[str] = None,
-    left_color: str = '#555',
-    right_color: str = '#007ec6',
+    left_color: str = "#555",
+    right_color: str = "#007ec6",
     center_color: Optional[str] = None,
     measurer: Optional[text_measurer.TextMeasurer] = None,
     left_title: Optional[str] = None,
@@ -139,7 +139,7 @@ def badge(
     embed_logo: bool = False,
     embed_right_image: bool = False,
     embed_center_image: bool = False,
-    id_suffix: str = '',
+    id_suffix: str = "",
 ) -> str:
     """Creates a github-style badge as an SVG image.
 
@@ -192,20 +192,18 @@ def badge(
             same page.
     """
     if measurer is None:
-        measurer = (
-            precalculated_text_measurer.PrecalculatedTextMeasurer.default())
+        measurer = precalculated_text_measurer.PrecalculatedTextMeasurer.default()
 
     if (left_link or right_link or center_link) and whole_link:
         raise ValueError(
-            'whole_link may not bet set with left_link, right_link, or center_link'
+            "whole_link may not bet set with left_link, right_link, or center_link"
         )
 
     if center_image and not (right_image or right_text):
-        raise ValueError('cannot have a center_image without a right element')
+        raise ValueError("cannot have a center_image without a right element")
 
-    if (center_image and not center_color) or (not center_image and
-                                               center_color):
-        raise ValueError('must have both a center_image and a center_color')
+    if (center_image and not center_color) or (not center_image and center_color):
+        raise ValueError("must have both a center_image and a center_color")
 
     if logo and embed_logo:
         logo = _embed_image(logo)
@@ -223,7 +221,7 @@ def badge(
     if right_text:
         right_text_width = measurer.text_width(right_text) / 10.0
 
-    template = _JINJA2_ENVIRONMENT.get_template('badge-template-full.svg')
+    template = _JINJA2_ENVIRONMENT.get_template("badge-template-full.svg")
 
     svg = template.render(
         left_text=left_text,

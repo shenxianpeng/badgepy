@@ -35,8 +35,8 @@ def generate_images(source_json_path, target_directory):
 
         for example in examples:
             srv.fix_embedded_url_reference(example)
-            filename = os.path.join(target_directory, example.pop('file_name'))
-            with open(filename, 'w', encoding='utf-8') as f:
+            filename = os.path.join(target_directory, example.pop("file_name"))
+            with open(filename, "w", encoding="utf-8") as f:
                 f.write(badgepy.badge(**example))
     finally:
         srv.stop_server()
@@ -44,27 +44,30 @@ def generate_images(source_json_path, target_directory):
 
 def main():
     parser = argparse.ArgumentParser(
-        description='generate a github-style badge given some text and colors')
+        description="generate a github-style badge given some text and colors"
+    )
 
     with importlib.resources.as_file(
-            importlib.resources.files('tests') /
-            'test-badges.json') as test_badges_path:
+        importlib.resources.files("tests") / "test-badges.json"
+    ) as test_badges_path:
         parser.add_argument(
-            '--source-path',
+            "--source-path",
             default=str(test_badges_path),
-            help='the text to show on the left-hand-side of the badge')
+            help="the text to show on the left-hand-side of the badge",
+        )
 
     with importlib.resources.as_file(
-            importlib.resources.files('tests') /
-            'golden-images') as golden_images_path:
+        importlib.resources.files("tests") / "golden-images"
+    ) as golden_images_path:
         parser.add_argument(
-            '--destination-dir',
+            "--destination-dir",
             default=str(golden_images_path),
-            help='the text to show on the left-hand-side of the badge')
+            help="the text to show on the left-hand-side of the badge",
+        )
 
     args = parser.parse_args()
     generate_images(args.source_path, args.destination_dir)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

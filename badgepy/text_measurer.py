@@ -22,4 +22,4 @@ class TextMeasurer:
 
     def text_width(self, text: str) -> float:
         """Returns the width, in pixels, of a string in DejaVu Sans 110pt."""
-        raise NotImplementedError('text_width not implemented')
+        raise NotImplementedError("text_width not implemented")

@@ -22,7 +22,6 @@ import threading
 
 
 class ImageServer:
-
     def __init__(self, image_data):
         self._image_data = image_data
 
@@ -30,14 +29,13 @@ class ImageServer:
         srv = self
 
         class Handler(server.BaseHTTPRequestHandler):
-
             def do_GET(self):
                 self.send_response(200)
-                self.send_header('Content-Type', 'image/png')
+                self.send_header("Content-Type", "image/png")
                 self.end_headers()
                 self.wfile.write(srv._image_data)
 
-        self._httpd = server.HTTPServer(('localhost', 0), Handler)
+        self._httpd = server.HTTPServer(("localhost", 0), Handler)
         self.logo_url = "http://localhost:{0}".format(self._httpd.server_port)
 
         thread = threading.Thread(target=self._httpd.serve_forever)
