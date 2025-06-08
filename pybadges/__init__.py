@@ -34,9 +34,8 @@ import mimetypes
 from typing import Optional
 import urllib.parse
 from xml.dom import minidom
+
 import filetype
-
-
 import jinja2
 import requests
 
