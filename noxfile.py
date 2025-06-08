@@ -45,7 +45,7 @@ def unit(session):
     'install',
     [
         'Jinja2==3.0.0',
-        'Pillow==9.0.0',
+        'Pillow==11.2.1',
         'requests>=2.25.0,<3.0.0',
         'urllib3>=1.25.0,<2.0.0',  # urllib3 2.0.0+ requires Python 3.8+
         'xmldiff==2.4'
