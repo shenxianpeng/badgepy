@@ -18,7 +18,6 @@ import argparse
 import json
 import os
 import os.path
-import pkg_resources
 import importlib.resources
 
 import pybadges
