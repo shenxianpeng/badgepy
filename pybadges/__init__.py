@@ -34,7 +34,7 @@ import mimetypes
 from typing import Optional
 import urllib.parse
 from xml.dom import minidom
-from imghdr import what
+from .imghdr import what
 
 import jinja2
 import requests
