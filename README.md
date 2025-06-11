@@ -1,18 +1,14 @@
+# badgepy
+
 [![CI](https://github.com/shenxianpeng/badgepy/actions/workflows/ci.yml/badge.svg)](https://github.com/shenxianpeng/badgepy/actions/workflows/ci.yml)
 ![pypi](https://img.shields.io/pypi/v/badgepy.svg)
 ![versions](https://img.shields.io/pypi/pyversions/badgepy.svg)
-   
-# badgepy
 
-> **badgepy** is a fork of [google/pybadges](https://github.com/google/pybadges) with fixes including Python 3.13 support, dropped Python 3.7/3.8 support, removal of deprecated `imghdr`, and replacement of `pkg_resources`. This project is actively maintained.
+> **badgepy** is a fork of [google/pybadges](https://github.com/google/pybadges) with fixes including Python 3.13 support, dropped Python 3.7/3.8 support, removal of deprecated `imghdr`, and replacement of `pkg_resources` and [many other fixes](https://github.com/shenxianpeng/badgepy/pulls?q=is%3Apr+is%3Aclosed). This project is actively maintained.
 
-badgepy is a Python library and command line tool that allows you to create Github-style badges as SVG images. For example:
+badgepy is a Python library and command line tool that allows you to create Github-style badges as SVG images.
 
-![pip installation](tests/golden-images/pip.svg)
-![pip installation](tests/golden-images/license.svg)
-![pip installation](tests/golden-images/build-passing.svg)
-
-The aesthetics of the generated badges matches the  visual design found in this
+The aesthetics of the generated badges matches the visual design found in this
 [specification](https://github.com/badges/shields/blob/master/spec/SPECIFICATION.md).
 
 The implementation of the library was heavily influenced by
@@ -73,8 +69,6 @@ badgepy \
     --browser
 ```
 
-![pip installation](tests/golden-images/complete.svg)
-
 #### A note about `--logo` and `--embed-logo`
 
 Note that the `--logo` option can include a regular URL:
@@ -88,18 +82,12 @@ badgepy \
     --logo='https://dev.w3.org/SVG/tools/svgweb/samples/svg-files/python.svg'
 ```
 
-![pip installation](tests/golden-images/python.svg)
-
 If the `--logo` option is set, the `--embed-logo` option can also be set.
 The `--embed-logo` option causes the content of the URL provided in `--logo`
 to be embedded in the badge rather than be referenced through a link.
 
 The advantage of using this option is an extra HTTP request will not be required
 to render the badge and that some browsers will not load image references at all.
-
-You can see the difference in your browser:
-
-![--embed-logo=yes](tests/golden-images/embedded-logo.svg) ![--embed-logo=no](tests/golden-images/no-embedded-logo.svg)
 
 #### A note about `--(whole|left|right)-title`
 
@@ -137,20 +125,14 @@ contains an example of serving badge images from a
    [kerning](https://en.wikipedia.org/wiki/Kerning) distances
    (for western glyphs) to determine the size of the badge.
    So Eastern European languages may be rendered less well than
-   Western European ones:
-
-   ![pip installation](tests/golden-images/saying-russian.svg)
+   Western European ones.
 
    and glyphs not present in Deja Vu Sans (the default font) may
-   be rendered very poorly:
-
-    ![pip installation](tests/golden-images/saying-chinese.svg)
+   be rendered very poorly.
 
  - badgepy does not have any explicit support for languages that
    are written right-to-left (e.g. Arabic, Hebrew) and the displayed
-   text direction may be incorrect:
-
-    ![pip installation](tests/golden-images/saying-arabic.svg)
+   text direction may be incorrect.
 
 ## Development
 
@@ -159,7 +141,7 @@ git clone https://github.com/shenxianpeng/badgepy.git
 cd badgepy
 python -m venv venv
 source venv/bin/activate
-# Installs in edit mode and with development dependencies.
+# Installs in editable mode with development dependencies.
 pip install -e .[dev]
 nox
 ```
