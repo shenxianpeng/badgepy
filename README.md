@@ -6,7 +6,7 @@
 
 > **badgepy** is a fork of [google/pybadges](https://github.com/google/pybadges) with fixes including Python 3.13 support, dropped Python 3.7/3.8 support, removal of deprecated `imghdr`, and replacement of `pkg_resources` and [many other fixes](https://github.com/shenxianpeng/badgepy/pulls?q=is%3Apr+is%3Aclosed). This project is actively maintained.
 
-badgepy is a Python library and command line tool that allows you to create Github-style badges as SVG images.
+badgepy is a Python library and command line tool that allows you to create GitHub-style badges as SVG images.
 
 The aesthetics of the generated badges matches the visual design found in this
 [specification](https://github.com/badges/shields/blob/master/spec/SPECIFICATION.md).
