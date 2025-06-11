@@ -53,12 +53,12 @@ Complete documentation of badgepy command arguments can be found using the `--he
 flag:
 
 ```sh
-python -m badgepy --help
+badgepy --help
 ```
 
 But the following usage demonstrates every interesting option:
 ```sh
-python -m badgepy \
+badgepy \
     --left-text=complete \
     --right-text=example \
     --left-color=green \
@@ -80,7 +80,7 @@ python -m badgepy \
 Note that the `--logo` option can include a regular URL:
 
 ```sh
-python -m badgepy \
+badgepy \
     --left-text="python" \
     --right-text="3.9, 3.10, 3.11, 3.12, 3.13" \
     --whole-link="https://www.python.org/" \
