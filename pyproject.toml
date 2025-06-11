@@ -47,6 +47,9 @@ dev = [
 [project.urls]
 Homepage = "https://github.com/shenxianpeng/badgepy"
 
+[project.scripts]
+badgepy = "badgepy.__main__:main"
+
 [tool.setuptools]
 packages = ["badgepy"]
 

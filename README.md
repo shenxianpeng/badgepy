@@ -23,7 +23,7 @@ The implementation of the library was heavily influenced by
 
 ### Installing
 
-badgepy can be installed using [pip](https://pypi.org/project/pip/):
+`badgepy` can be installed using [pip](https://pypi.org/project/pip/):
 
 ```sh
 pip install badgepy
@@ -53,12 +53,12 @@ Complete documentation of badgepy command arguments can be found using the `--he
 flag:
 
 ```sh
-python -m badgepy --help
+badgepy --help
 ```
 
 But the following usage demonstrates every interesting option:
 ```sh
-python -m badgepy \
+badgepy \
     --left-text=complete \
     --right-text=example \
     --left-color=green \
@@ -80,9 +80,9 @@ python -m badgepy \
 Note that the `--logo` option can include a regular URL:
 
 ```sh
-python -m badgepy \
+badgepy \
     --left-text="python" \
-    --right-text="3.2, 3.3, 3.4, 3.5, 3.6" \
+    --right-text="3.9, 3.10, 3.11, 3.12, 3.13" \
     --whole-link="https://www.python.org/" \
     --browser \
     --logo='https://dev.w3.org/SVG/tools/svgweb/samples/svg-files/python.svg'
@@ -107,7 +107,6 @@ The `title` element is usually displayed as a
 [pop-up by browsers](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/title)
 but is currently
 [filtered by Github](https://github.com/github/markup/issues/1267).
-
 
 ### Library usage
 
@@ -158,7 +157,7 @@ contains an example of serving badge images from a
 ```sh
 git clone https://github.com/shenxianpeng/badgepy.git
 cd badgepy
-python -m virtualenv venv
+python -m venv venv
 source venv/bin/activate
 # Installs in edit mode and with development dependencies.
 pip install -e .[dev]
@@ -174,4 +173,4 @@ We use [SemVer](http://semver.org/) for versioning.
 
 ## License
 
-This project is licensed under the Apache License - see the [LICENSE](LICENSE) file for details
+This project is licensed under the Apache License - see the [LICENSE](LICENSE) file for details.
