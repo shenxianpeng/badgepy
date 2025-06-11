@@ -21,10 +21,8 @@ import argparse
 import sys
 import tempfile
 import webbrowser
-
-sys.path.append("/home/nick/git/badgepy/")
 import badgepy
-from badgepy.version import __version__
+from importlib.metadata import version
 
 
 def main():
@@ -173,7 +171,7 @@ def main():
         "-v",
         "--version",
         action="version",
-        version="%(prog)s {version}".format(version=__version__),
+        version="%(prog)s {version}".format(version=version("badgepy")),
     )
     args = parser.parse_args()
 
