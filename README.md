@@ -69,6 +69,8 @@ badgepy \
     --browser
 ```
 
+![complete](tests/golden-images/complete.svg)
+
 #### A note about `--logo` and `--embed-logo`
 
 Note that the `--logo` option can include a regular URL:
@@ -82,12 +84,17 @@ badgepy \
     --logo='https://dev.w3.org/SVG/tools/svgweb/samples/svg-files/python.svg'
 ```
 
+![python](tests/golden-images/python.svg)
+
 If the `--logo` option is set, the `--embed-logo` option can also be set.
 The `--embed-logo` option causes the content of the URL provided in `--logo`
 to be embedded in the badge rather than be referenced through a link.
 
 The advantage of using this option is an extra HTTP request will not be required
 to render the badge and that some browsers will not load image references at all.
+
+![--embed-logo=yes](tests/golden-images/embedded-logo.svg) 
+![--embed-logo=no](tests/golden-images/no-embedded-logo.svg)
 
 #### A note about `--(whole|left|right)-title`
 
@@ -127,12 +134,18 @@ contains an example of serving badge images from a
    So Eastern European languages may be rendered less well than
    Western European ones.
 
+   ![saying-russian](tests/golden-images/saying-russian.svg)
+
    and glyphs not present in Deja Vu Sans (the default font) may
    be rendered very poorly.
+
+   ![saying-chinese](tests/golden-images/saying-chinese.svg)
 
  - badgepy does not have any explicit support for languages that
    are written right-to-left (e.g. Arabic, Hebrew) and the displayed
    text direction may be incorrect.
+
+   ![saying-arabic](tests/golden-images/saying-arabic.svg)
 
 ## Development
 
