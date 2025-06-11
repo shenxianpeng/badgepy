@@ -33,7 +33,7 @@ dependencies = [
 
 [project.optional-dependencies]
 pil-measurement = [
-    "Pillow>=6,<10"
+    "Pillow>=6,<12"
 ]
 dev = [
     "Flask>=2.0",
