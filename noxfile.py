@@ -23,10 +23,9 @@ def _run_tests(session):
 
 @nox.session
 def lint(session):
-    """Run ruff"""
     """Run the linter."""
     session.install("ruff")
-    session.run("ruff", "format", "badgepy", "tests", "server-example", *session.posargs)
+    session.run("ruff", "format", ".", *session.posargs)
 
 
 @nox.session
