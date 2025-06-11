@@ -1,13 +1,13 @@
 [build-system]
-requires = ["setuptools>=61", "wheel"]
+requires = ["setuptools>=61", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "badgepy"
-version = "1.0.0"
 description = "A library and command-line tool for generating Github-style badges"
 readme = "README.md"
 requires-python = ">=3.9"
+dynamic = ["version"]
 license = { file = "LICENSE" }
 authors = [
     { name = "Brian Quinlan", email = "brian@sweetapp.com" },
@@ -45,13 +45,22 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/shenxianpeng/badgepy"
+source = "https://github.com/shenxianpeng/badgepy"
+tracker = "https://github.com/shenxianpeng/badgepy/issues"
 
 [project.scripts]
 badgepy = "badgepy.__main__:main"
 
 [tool.setuptools]
 packages = ["badgepy"]
+
+[tool.setuptools_scm]
+# It would be nice to include the commit hash in the version, but that
+# can't be done in a PEP 440-compatible way.
+version_scheme= "no-guess-dev"
+# Test PyPI does not support local versions.
+local_scheme = "no-local-version"
+fallback_version = "0.0.0"
 
 [tool.setuptools.package-data]
 badgepy = ["badge-template-full.svg", "default-widths.json", "py.typed"]
