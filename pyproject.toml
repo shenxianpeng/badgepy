@@ -1,0 +1,54 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "badgepy"
+version = "1.0.0"
+description = "A library and command-line tool for generating Github-style badges"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { file = "LICENSE" }
+authors = [
+    { name = "Brian Quinlan", email = "brian@sweetapp.com" },
+    { name = "Xianpeng Shen", email = "xianpeng.shen@gmail.com" }
+]
+keywords = ["github", "gh-badges", "badge", "shield", "status"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Operating System :: OS Independent"
+]
+dependencies = [
+    "Jinja2>=3,<4",
+    "requests>=2.22.0,<3",
+    "filetype>=1.2.0,<2.0.0"
+]
+
+[project.optional-dependencies]
+pil-measurement = [
+    "Pillow>=6,<10"
+]
+dev = [
+    "Flask>=2.0",
+    "fonttools>=3.26",
+    "nox",
+    "Pillow>=5",
+    "pytest>=3.6",
+    "xmldiff>=2.4"
+]
+
+[project.urls]
+Homepage = "https://github.com/shenxianpeng/badgepy"
+
+[tool.setuptools]
+packages = ["badgepy"]
+
+[tool.setuptools.package-data]
+badgepy = ["badge-template-full.svg", "default-widths.json", "py.typed"]
