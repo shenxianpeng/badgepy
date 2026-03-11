@@ -44,7 +44,7 @@ def unit(session):
         "Pillow>=11.2.1,<12.0.0",
         "requests>=2.25.0,<3.0.0",
         "urllib3>=1.25.0,<2.0.0",  # urllib3 2.0.0+ requires Python 3.8+
-        "xmldiff==2.4",
+        "xmldiff==2.7",
     ],
 )
 def compatibility(session, install):

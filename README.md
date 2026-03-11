@@ -4,7 +4,7 @@
 [![pypi](https://img.shields.io/pypi/v/badgepy.svg)](https://pypi.org/project/badgepy/)
 ![versions](https://img.shields.io/pypi/pyversions/badgepy.svg)
 
-> **badgepy** is a fork of [google/pybadges](https://github.com/google/pybadges) with fixes including Python 3.13 support, dropped Python 3.7/3.8 support, removal of deprecated `imghdr`, and replacement of `pkg_resources` and [many other fixes](https://github.com/shenxianpeng/badgepy/pulls?q=is%3Apr+is%3Aclosed). This project is actively maintained.
+> **badgepy** is a fork of [google/pybadges](https://github.com/google/pybadges) with fixes including Python 3.13+ support, dropped Python 3.7/3.8 support, removal of deprecated `imghdr`, and replacement of `pkg_resources` and [many other fixes](https://github.com/shenxianpeng/badgepy/pulls?q=is%3Apr+is%3Aclosed). This project is actively maintained.
 
 badgepy is a Python library and command line tool that allows you to create GitHub-style badges as SVG images.
 
@@ -78,7 +78,7 @@ Note that the `--logo` option can include a regular URL:
 ```sh
 badgepy \
     --left-text="python" \
-    --right-text="3.9, 3.10, 3.11, 3.12, 3.13" \
+    --right-text="3.9, 3.10, 3.11, 3.12, 3.13, 3.14" \
     --whole-link="https://www.python.org/" \
     --browser \
     --logo='https://dev.w3.org/SVG/tools/svgweb/samples/svg-files/python.svg'
