@@ -133,11 +133,11 @@ badgepy includes preset recipes for common badge types with automatic color codi
 
 | Command | Preview |
 | ------- | ------- |
-| `badgepy preset build passing -o badges/build.svg` | ![build passing](tests/golden-images/preset-build.svg) |
-| `badgepy preset coverage 85.3 -o badges/coverage.svg` | ![coverage 85.3%](tests/golden-images/preset-coverage.svg) |
-| `badgepy preset version v1.2.3 -o badges/version.svg` | ![version v1.2.3](tests/golden-images/preset-version.svg) |
-| `badgepy preset license MIT -o badges/license.svg` | ![license MIT](tests/golden-images/preset-license.svg) |
-| `badgepy preset custom "linux" --label platform --color green -o badges/platform.svg` | ![platform linux](tests/golden-images/preset-platform.svg) |
+| `badgepy preset build passing -o badges/build.svg` | ![build passing](badges/build.svg) |
+| `badgepy preset coverage 85.3 -o badges/coverage.svg` | ![coverage 85.3%](badges/coverage.svg) |
+| `badgepy preset version v1.2.3 -o badges/version.svg` | ![version v1.2.3](badges/version.svg) |
+| `badgepy preset license MIT -o badges/license.svg` | ![license MIT](badges/license.svg) |
+| `badgepy preset custom "linux" --label platform --color green -o badges/platform.svg` | ![platform linux](badges/platform.svg) |
 
 Or from Python:
 
@@ -155,8 +155,8 @@ Generate badges directly from CI test and coverage reports:
 
 | Command | Preview |
 | ------- | ------- |
-| `badgepy from-junit tests/test-results.xml -o badges/tests.svg` | ![tests](tests/golden-images/from-junit-tests.svg) |
-| `badgepy from-coverage tests/coverage.xml --output-dir badges/` | ![coverage](tests/golden-images/from-coverage.svg) ![branch-coverage](tests/golden-images/from-branch-coverage.svg) |
+| `badgepy from-junit tests/test-results.xml -o badges/tests.svg` | ![tests](badges/tests.svg) |
+| `badgepy from-coverage tests/coverage.xml --output-dir badges/` | ![coverage](badges/coverage.svg) ![branch-coverage](badges/branch-coverage.svg) |
 
 ```sh
 # From generic key-value or JSON files
