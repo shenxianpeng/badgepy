@@ -42,6 +42,7 @@ dev = [
     "nox",
     "Pillow>=5",
     "pytest>=3.6",
+    "pytest-cov>=4.0",
     "xmldiff>=2.4"
 ]
 
@@ -53,7 +54,7 @@ tracker = "https://github.com/shenxianpeng/badgepy/issues"
 badgepy = "badgepy.__main__:main"
 
 [tool.setuptools]
-packages = ["badgepy"]
+packages = ["badgepy", "badgepy.parsers"]
 
 [tool.setuptools_scm]
 # It would be nice to include the commit hash in the version, but that
