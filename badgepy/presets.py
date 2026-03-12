@@ -167,7 +167,6 @@ def tests_badge(passed: int, failed: int, skipped: int = 0) -> str:
     Returns:
         SVG string of the badge.
     """
-    total = passed + failed + skipped
     parts = [f"{passed} passed"]
     if failed:
         parts.append(f"{failed} failed")
