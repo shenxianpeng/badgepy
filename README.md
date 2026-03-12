@@ -126,6 +126,71 @@ badgepy can be used to serve badge images on the web.
 contains an example of serving badge images from a
 [Flask server](https://flask.palletsprojects.com/).
 
+### Preset Badges
+
+badgepy includes preset recipes for common badge types with automatic color coding:
+
+```sh
+# Build status badge (auto-colored: passing=green, failing=red)
+badgepy preset build passing -o badges/build.svg
+
+# Coverage badge (auto-colored by percentage thresholds)
+badgepy preset coverage 85.3 -o badges/coverage.svg
+
+# Version and license badges
+badgepy preset version v1.2.3 -o badges/version.svg
+badgepy preset license MIT -o badges/license.svg
+
+# Custom badge (shields.io static badge compatible)
+badgepy preset custom "linux" --label platform --color green -o badges/platform.svg
+```
+
+Or from Python:
+
+```python
+from badgepy.presets import build_badge, coverage_badge, custom_badge
+
+svg = build_badge('passing')
+svg = coverage_badge(85.3)
+svg = custom_badge(label='platform', message='linux', color='green')
+```
+
+### CI Report Badges
+
+Generate badges directly from CI test and coverage reports:
+
+```sh
+# From JUnit XML test reports (pytest, JUnit, Go, etc.)
+badgepy from-junit test-results.xml -o badges/tests.svg
+
+# From Cobertura XML coverage reports (coverage.py, gcov, JaCoCo, etc.)
+badgepy from-coverage coverage.xml -o badges/coverage.svg
+
+# From generic key-value or JSON files
+badgepy from-generic metrics.json --output-dir badges/
+```
+
+Or from Python:
+
+```python
+from badgepy.parsers import badges_from_junit, badges_from_coverage
+
+badges = badges_from_junit('test-results.xml')   # {'tests': '<svg...>'}
+badges = badges_from_coverage('coverage.xml')     # {'coverage': '<svg...>', 'branch-coverage': '<svg...>'}
+```
+
+See [CI Integration Guide](docs/ci-integration.md) for GitHub Actions, GitLab CI, and Jenkins examples.
+
+See [Shields.io Migration Guide](docs/shields-migration.md) to replace shields.io with badgepy.
+
+### Output to File
+
+Use `-o` / `--output` to write badges to a file instead of stdout:
+
+```sh
+badgepy --left-text=build --right-text=passing --right-color=green -o badges/build.svg
+```
+
 ### Caveats
 
  - badgepy uses a pre-calculated table of text widths and

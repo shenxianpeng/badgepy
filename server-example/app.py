@@ -65,5 +65,36 @@ def serve_badge():
     return response
 
 
+@app.route("/badge/<path:spec>")
+def shields_compatible(spec):
+    """Serve a badge using a shields.io-compatible URL format.
+
+    URL format: /badge/label-message-color
+    Examples:
+        /badge/build-passing-brightgreen
+        /badge/coverage-85%25-green
+        /badge/license-MIT-blue
+    """
+    parts = spec.rsplit("-", 2)
+    if len(parts) == 3:
+        label, message, color = parts
+    elif len(parts) == 2:
+        label, message = parts
+        color = "blue"
+    else:
+        label = parts[0]
+        message = ""
+        color = "blue"
+
+    badge_svg = badgepy.badge(
+        left_text=label,
+        right_text=message,
+        right_color=color,
+    )
+    response = flask.make_response(badge_svg)
+    response.content_type = "image/svg+xml"
+    return response
+
+
 if __name__ == "__main__":
     app.run()
