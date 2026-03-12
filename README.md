@@ -1,6 +1,7 @@
 # badgepy
 
 [![CI](https://github.com/shenxianpeng/badgepy/actions/workflows/ci.yml/badge.svg)](https://github.com/shenxianpeng/badgepy/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/shenxianpeng/badgepy/branch/main/graph/badge.svg)](https://codecov.io/gh/shenxianpeng/badgepy)
 [![pypi](https://img.shields.io/pypi/v/badgepy.svg)](https://pypi.org/project/badgepy/)
 ![versions](https://img.shields.io/pypi/pyversions/badgepy.svg)
 

@@ -22,6 +22,23 @@ def _run_tests(session):
 
 
 @nox.session
+def coverage(session):
+    """Run the unit test suite and generate a coverage report."""
+    session.install("-e", ".[dev]")
+    session.install("flask")
+    session.run(
+        "py.test",
+        "--quiet",
+        "--cov=badgepy",
+        "--cov-report=xml",
+        "--cov-report=term-missing",
+        "tests",
+        "server-example",
+        *session.posargs,
+    )
+
+
+@nox.session
 def lint(session):
     """Run the linter."""
     session.install("ruff")
