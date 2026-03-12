@@ -69,7 +69,7 @@ badgepy from-generic metrics.json --output-dir badges/
 
 | Preset | Usage | Auto-coloring |
 |---|---|---|
-| `build` | `badgepy preset build <status>` | passing=green, failing=red, error=red, pending=yellow |
+| `build` | `badgepy preset build <status>` | passing=brightgreen, failing=red, error=red, pending=yellow |
 | `coverage` | `badgepy preset coverage <percentage>` | 90+=brightgreen, 80+=green, 70+=yellowgreen, 60+=yellow, 40+=orange, <40=red |
 | `version` | `badgepy preset version <version>` | blue |
 | `license` | `badgepy preset license <license>` | blue |

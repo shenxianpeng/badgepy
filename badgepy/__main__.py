@@ -62,7 +62,7 @@ def _cmd_badge(args: argparse.Namespace) -> None:
     if (args.left_link or args.right_link or args.center_link) and args.whole_link:
         print(
             "argument --whole-link: cannot be set with "
-            + "--left-link, --right-link, or --center_link",
+            + "--left-link, --right-link, or --center-link",
             file=sys.stderr,
         )
         sys.exit(1)

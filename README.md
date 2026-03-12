@@ -131,7 +131,7 @@ contains an example of serving badge images from a
 badgepy includes preset recipes for common badge types with automatic color coding:
 
 ```sh
-# Build status badge (auto-colored: passing=green, failing=red)
+# Build status badge (auto-colored: passing=brightgreen, failing=red)
 badgepy preset build passing -o badges/build.svg
 
 # Coverage badge (auto-colored by percentage thresholds)

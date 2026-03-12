@@ -47,7 +47,9 @@ This guide shows how to use badgepy in CI pipelines to automatically generate ba
   run: badgepy preset build passing -o badges/build.svg
 
 - name: Generate version badge
-  run: badgepy preset version "$(python setup.py --version)" -o badges/version.svg
+  run: |
+    VERSION=$(python -c 'import importlib.metadata as m; print(m.version("badgepy"))')
+    badgepy preset version "$VERSION" -o badges/version.svg
 ```
 
 ## GitLab CI
