@@ -131,20 +131,13 @@ contains an example of serving badge images from a
 
 badgepy includes preset recipes for common badge types with automatic color coding:
 
-```sh
-# Build status badge (auto-colored: passing=brightgreen, failing=red)
-badgepy preset build passing -o badges/build.svg
-
-# Coverage badge (auto-colored by percentage thresholds)
-badgepy preset coverage 85.3 -o badges/coverage.svg
-
-# Version and license badges
-badgepy preset version v1.2.3 -o badges/version.svg
-badgepy preset license MIT -o badges/license.svg
-
-# Custom badge (shields.io static badge compatible)
-badgepy preset custom "linux" --label platform --color green -o badges/platform.svg
-```
+| Command | Preview |
+| ------- | ------- |
+| `badgepy preset build passing -o badges/build.svg` | ![build passing](badges/build.svg) |
+| `badgepy preset coverage 85.3 -o badges/coverage.svg` | ![coverage 85.3%](badges/coverage.svg) |
+| `badgepy preset version v1.2.3 -o badges/version.svg` | ![version v1.2.3](badges/version.svg) |
+| `badgepy preset license MIT -o badges/license.svg` | ![license MIT](badges/license.svg) |
+| `badgepy preset custom "linux" --label platform --color green -o badges/platform.svg` | ![platform linux](badges/platform.svg) |
 
 Or from Python:
 
@@ -160,13 +153,12 @@ svg = custom_badge(label='platform', message='linux', color='green')
 
 Generate badges directly from CI test and coverage reports:
 
+| Command | Preview |
+| ------- | ------- |
+| `badgepy from-junit test-results.xml -o badges/tests.svg` | ![tests](tests/golden-images/tests.svg) |
+| `badgepy from-coverage coverage.xml -o badges/coverage.svg` | ![coverage](badges/coverage.svg) |
+
 ```sh
-# From JUnit XML test reports (pytest, JUnit, Go, etc.)
-badgepy from-junit test-results.xml -o badges/tests.svg
-
-# From Cobertura XML coverage reports (coverage.py, gcov, JaCoCo, etc.)
-badgepy from-coverage coverage.xml -o badges/coverage.svg
-
 # From generic key-value or JSON files
 badgepy from-generic metrics.json --output-dir badges/
 ```
