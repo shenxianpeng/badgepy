@@ -44,7 +44,7 @@ badgepy can be used both from the command line and as a Python library.
 The command line interface is a great way to experiment with the API before
 writing Python code.
 
-You could also look at the [example server](https://github.com/shenxianpeng/badgepy/tree/master/server-example).
+You could also look at the [example server](https://github.com/shenxianpeng/badgepy/tree/main/server-example).
 
 ### Command line usage
 
@@ -125,7 +125,7 @@ hyphen/minus (e.g. `--left-text` => `left_text=`)
 
 badgepy can be used to serve badge images on the web.
 
-[server-example](https://github.com/shenxianpeng/badgepy/tree/master/server-example)
+[server-example](https://github.com/shenxianpeng/badgepy/tree/main/server-example)
 contains an example of serving badge images from a
 [Flask server](https://flask.palletsprojects.com/).
 
