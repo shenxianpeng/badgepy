@@ -19,6 +19,37 @@ import badgepy
 app = flask.Flask(__name__)
 
 
+def _build_cli_cmd(b):
+    """Build the CLI command string for a badge dict."""
+    parts = ["badgepy"]
+    parts.append(f'--left-text="{b["left_text"]}"')
+    parts.append(f'--right-text="{b["right_text"]}"')
+    if b.get("left_color"):
+        parts.append(f'--left-color="{b["left_color"]}"')
+    if b.get("right_color"):
+        parts.append(f'--right-color="{b["right_color"]}"')
+    if b.get("logo") and not b["logo"].startswith("data:"):
+        parts.append(f'--logo="{b["logo"]}"')
+    parts.append("--browser")
+    return " \\\n    ".join(parts)
+
+
+def _build_python_snippet(b):
+    """Build the Python API snippet for a badge dict."""
+    lines = ["from badgepy import badge", "", "badge("]
+    lines.append(f'    left_text="{b["left_text"]}",')
+    lines.append(f'    right_text="{b["right_text"]}",')
+    if b.get("left_color"):
+        lines.append(f'    left_color="{b["left_color"]}",')
+    if b.get("right_color"):
+        lines.append(f'    right_color="{b["right_color"]}",')
+    if b.get("logo"):
+        logo_display = b["logo"] if not b["logo"].startswith("data:") else "data:image/png;base64,..."
+        lines.append(f'    logo="{logo_display}",')
+    lines.append(")")
+    return "\n".join(lines)
+
+
 @app.route("/")
 @app.route("/index")
 def index():
@@ -46,6 +77,8 @@ def index():
     ]
     for b in badges:
         b["url"] = flask.url_for(".serve_badge", **b)
+        b["python_snippet"] = _build_python_snippet(b)
+        b["cli_cmd"] = _build_cli_cmd(b)
     return flask.render_template("index.html", badges=badges)
 
 
