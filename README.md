@@ -1,13 +1,15 @@
 # badgepy
 
 [![CI](https://github.com/shenxianpeng/badgepy/actions/workflows/ci.yml/badge.svg)](https://github.com/shenxianpeng/badgepy/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/shenxianpeng/badgepy/branch/main/graph/badge.svg)](https://codecov.io/gh/shenxianpeng/badgepy)
+[![codecov](https://codecov.io/gh/shenxianpeng/badgepy/graph/badge.svg?token=CIU1XB5U2U)](https://codecov.io/gh/shenxianpeng/badgepy)
 [![pypi](https://img.shields.io/pypi/v/badgepy.svg)](https://pypi.org/project/badgepy/)
 ![versions](https://img.shields.io/pypi/pyversions/badgepy.svg)
 
-> **badgepy** is a fork of [google/pybadges](https://github.com/google/pybadges) with fixes including added support for Python 3.13 and 3.14, dropped Python 3.7/3.8 support, removal of deprecated `imghdr`, and replacement of `pkg_resources` and [many other fixes](https://github.com/shenxianpeng/badgepy/pulls?q=is%3Apr+is%3Aclosed). This project is actively maintained.
+> [!NOTE]
+> **badgepy** is a fork of [google/pybadges](https://github.com/google/pybadges) with fixes including added support for Python 3.13 and 3.14, dropped Python 3.7/3.8 support, removal of deprecated `imghdr`, and replacement of `pkg_resources` and [many other fixes](https://github.com/shenxianpeng/badgepy/pulls?q=is%3Apr+is%3Aclosed). 
+> This project is actively maintained.
 
-badgepy is a Python library and command line tool that allows you to create GitHub-style badges as SVG images.
+badgepy is a Python library and command line tool that allows you to create GitHub-style badges as SVG images. It also provides a **local [shields.io](https://shields.io)-style badge generator** — generate badges from CI reports (JUnit, Cobertura), use preset recipes for build/coverage/version/license badges, and serve them via a Flask server, all without relying on external services.
 
 The aesthetics of the generated badges matches the visual design found in this
 [specification](https://github.com/badges/shields/blob/master/spec/SPECIFICATION.md).
@@ -131,20 +133,13 @@ contains an example of serving badge images from a
 
 badgepy includes preset recipes for common badge types with automatic color coding:
 
-```sh
-# Build status badge (auto-colored: passing=brightgreen, failing=red)
-badgepy preset build passing -o badges/build.svg
-
-# Coverage badge (auto-colored by percentage thresholds)
-badgepy preset coverage 85.3 -o badges/coverage.svg
-
-# Version and license badges
-badgepy preset version v1.2.3 -o badges/version.svg
-badgepy preset license MIT -o badges/license.svg
-
-# Custom badge (shields.io static badge compatible)
-badgepy preset custom "linux" --label platform --color green -o badges/platform.svg
-```
+| Command | Preview |
+| ------- | ------- |
+| `badgepy preset build passing -o badges/build.svg` | ![build passing](badges/build.svg) |
+| `badgepy preset coverage 85.3 -o badges/coverage.svg` | ![coverage 85.3%](badges/coverage.svg) |
+| `badgepy preset version v1.2.3 -o badges/version.svg` | ![version v1.2.3](badges/version.svg) |
+| `badgepy preset license MIT -o badges/license.svg` | ![license MIT](badges/license.svg) |
+| `badgepy preset custom "linux" --label platform --color green -o badges/platform.svg` | ![platform linux](badges/platform.svg) |
 
 Or from Python:
 
@@ -160,13 +155,12 @@ svg = custom_badge(label='platform', message='linux', color='green')
 
 Generate badges directly from CI test and coverage reports:
 
+| Command | Preview |
+| ------- | ------- |
+| `badgepy from-junit tests/test-results.xml -o badges/tests.svg` | ![tests](badges/tests.svg) |
+| `badgepy from-coverage tests/coverage.xml --output-dir badges/` | ![coverage](badges/coverage.svg) ![branch-coverage](badges/branch-coverage.svg) |
+
 ```sh
-# From JUnit XML test reports (pytest, JUnit, Go, etc.)
-badgepy from-junit test-results.xml -o badges/tests.svg
-
-# From Cobertura XML coverage reports (coverage.py, gcov, JaCoCo, etc.)
-badgepy from-coverage coverage.xml -o badges/coverage.svg
-
 # From generic key-value or JSON files
 badgepy from-generic metrics.json --output-dir badges/
 ```
@@ -176,8 +170,8 @@ Or from Python:
 ```python
 from badgepy.parsers import badges_from_junit, badges_from_coverage
 
-badges = badges_from_junit('test-results.xml')   # {'tests': '<svg...>'}
-badges = badges_from_coverage('coverage.xml')     # {'coverage': '<svg...>', 'branch-coverage': '<svg...>'}
+badges = badges_from_junit('tests/test-results.xml')   # {'tests': '<svg...>'}
+badges = badges_from_coverage('tests/coverage.xml')    # {'coverage': '<svg...>', 'branch-coverage': '<svg...>'}
 ```
 
 See [CI Integration Guide](docs/ci-integration.md) for GitHub Actions, GitLab CI, and Jenkins examples.

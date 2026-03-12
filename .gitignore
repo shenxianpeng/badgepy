@@ -113,6 +113,3 @@ dmypy.json
 
 # PyCharm
 .idea/
-
-# Output
-badges/
