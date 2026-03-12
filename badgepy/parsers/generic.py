@@ -30,6 +30,7 @@ JSON::
 """
 
 import json
+import os
 from typing import Union
 
 from badgepy.presets import custom_badge
@@ -44,8 +45,6 @@ def parse_generic(source: Union[str, "os.PathLike[str]"]) -> dict[str, str]:
     Returns:
         A dict of parsed key-value pairs (all values as strings).
     """
-    import os
-
     with open(os.fspath(source), "r", encoding="utf-8") as f:
         content = f.read().strip()
 

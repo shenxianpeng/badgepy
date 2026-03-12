@@ -25,6 +25,7 @@ Example JUnit XML structure::
     </testsuites>
 """
 
+import os
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
 from typing import Union
@@ -55,8 +56,6 @@ def parse_junit(source: Union[str, "os.PathLike[str]"]) -> JUnitResult:
     Returns:
         A JUnitResult with aggregated test counts.
     """
-    import os
-
     tree = ET.parse(os.fspath(source))
     root = tree.getroot()
 

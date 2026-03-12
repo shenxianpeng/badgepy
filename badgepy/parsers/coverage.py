@@ -23,6 +23,7 @@ Example Cobertura XML structure::
     </coverage>
 """
 
+import os
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
 from typing import Optional, Union
@@ -57,8 +58,6 @@ def parse_coverage(source: Union[str, "os.PathLike[str]"]) -> CoverageResult:
     Returns:
         A CoverageResult with coverage rates.
     """
-    import os
-
     tree = ET.parse(os.fspath(source))
     root = tree.getroot()
 
