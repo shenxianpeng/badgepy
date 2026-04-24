@@ -118,6 +118,11 @@ def _embed_image(url: str) -> str:
     return "data:image/{};base64,{}".format(image_type, encoded_image)
 
 
+def _normalize_color(color: str) -> str:
+    color = color.strip("'\"")
+    return _NAME_TO_COLOR.get(color, color)
+
+
 def badge(
     left_text: str,
     right_text: Optional[str] = None,
@@ -126,8 +131,8 @@ def badge(
     center_link: Optional[str] = None,
     whole_link: Optional[str] = None,
     logo: Optional[str] = None,
-    left_color: str = "#555",
-    right_color: str = "#007ec6",
+    left_color: Optional[str] = "#555",
+    right_color: Optional[str] = "#007ec6",
     center_color: Optional[str] = None,
     measurer: Optional[text_measurer.TextMeasurer] = None,
     left_title: Optional[str] = None,
@@ -215,11 +220,17 @@ def badge(
         center_image = _embed_image(center_image)
 
     if center_color:
-        center_color = center_color.strip("'\"")
-        center_color = _NAME_TO_COLOR.get(center_color, center_color)
+        center_color = _normalize_color(center_color)
 
-    left_color = left_color.strip("'\"")
-    right_color = right_color.strip("'\"")
+    if left_color is None:
+        left_color = "#555"
+    else:
+        left_color = _normalize_color(left_color)
+
+    if right_color is None:
+        right_color = "#007ec6"
+    else:
+        right_color = _normalize_color(right_color)
 
     right_text_width = None
     if right_text:
@@ -237,8 +248,8 @@ def badge(
         whole_link=whole_link,
         center_link=center_link,
         logo=logo,
-        left_color=_NAME_TO_COLOR.get(left_color, left_color),
-        right_color=_NAME_TO_COLOR.get(right_color, right_color),
+        left_color=left_color,
+        right_color=right_color,
         center_color=center_color,
         left_title=left_title,
         right_title=right_title,
