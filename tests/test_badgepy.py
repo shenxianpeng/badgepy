@@ -98,6 +98,28 @@ class TestbadgepyBadge(unittest.TestCase):
                         % (file_name, diff, html.name)
                     )
 
+    def test_quoted_colors_are_normalized(self):
+        svg = badgepy.badge(
+            left_text="build",
+            right_text="passing",
+            left_color="'grey'",
+            right_color='"green"',
+        )
+
+        self.assertIn('fill="#555"', svg)
+        self.assertIn('fill="#97CA00"', svg)
+
+    def test_none_colors_use_defaults(self):
+        svg = badgepy.badge(
+            left_text="build",
+            right_text="passing",
+            left_color=None,
+            right_color=None,
+        )
+
+        self.assertIn('fill="#555"', svg)
+        self.assertIn('fill="#007ec6"', svg)
+
 
 class TestEmbedImage(unittest.TestCase):
     """Tests for badgepy._embed_image."""
