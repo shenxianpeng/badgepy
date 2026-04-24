@@ -215,7 +215,11 @@ def badge(
         center_image = _embed_image(center_image)
 
     if center_color:
+        center_color = center_color.strip("'\"")
         center_color = _NAME_TO_COLOR.get(center_color, center_color)
+
+    left_color = left_color.strip("'\"")
+    right_color = right_color.strip("'\"")
 
     right_text_width = None
     if right_text:
