@@ -6,17 +6,40 @@
 ![versions](https://img.shields.io/pypi/pyversions/badgepy.svg)
 
 > [!NOTE]
-> **badgepy** is a fork of [google/pybadges](https://github.com/google/pybadges) with fixes including added support for Python 3.13 and 3.14, dropped Python 3.7/3.8 support, removal of deprecated `imghdr`, and replacement of `pkg_resources` and [many other fixes](https://github.com/shenxianpeng/badgepy/pulls?q=is%3Apr+is%3Aclosed). 
-> This project is actively maintained.
+> **badgepy** is a fork of [google/pybadges](https://github.com/google/pybadges) with fixes including added support for Python 3.13 and 3.14, dropped Python 3.7/3.8 support, removal of deprecated `imghdr`, and replacement of `pkg_resources` and [many other fixes](https://github.com/shenxianpeng/badgepy/pulls?q=is%3Apr+is%3Aclosed). This project is actively maintained.
 
-badgepy is a Python library and command line tool that allows you to create GitHub-style badges as SVG images. It also provides a **local [shields.io](https://shields.io)-style badge generator** — generate badges from CI reports (JUnit, Cobertura), use preset recipes for build/coverage/version/license badges, and serve them via a Flask server, all without relying on external services.
+badgepy is a Python library and command-line tool for generating GitHub-style badges as SVG images — no external service required. Badges are rendered locally, offline, and fully under your control. It also provides a **local [shields.io](https://shields.io)-style badge generator** — generate badges from CI reports (JUnit, Cobertura), use preset recipes for build/coverage/version/license badges, and serve them via a Flask server, all without relying on external services.
 
-The aesthetics of the generated badges matches the visual design found in this
-[specification](https://github.com/badges/shields/blob/master/spec/SPECIFICATION.md).
+The visual design follows the [Shields specification](https://github.com/badges/shields/blob/master/spec/SPECIFICATION.md) and is compatible with [Shields.io](https://shields.io).
 
-The implementation of the library was heavily influenced by
-[Shields.io](https://github.com/badges/shields) and the JavaScript
-[badge-maker](https://github.com/badges/shields/tree/master/badge-maker#badge-maker) library.
+## Shields.io vs badgepy
+
+Both tools produce identical-looking badges, but they work very differently. Here's how to choose:
+
+| | [Shields.io](https://shields.io) | badgepy |
+|---|---|---|
+| **How it works** | HTTP service — you request a badge URL and get back an SVG | Python library/CLI — generates SVGs locally |
+| **Internet required** | Yes (or [self-host](https://github.com/badges/shields)) | No — works fully offline |
+| **Setup** | Zero — just use a URL in your README | `pip install badgepy` |
+| **Customization** | URL query parameters only | Full programmatic control in Python |
+| **CI integration** | Via shields.io endpoint JSON | Native parsers for JUnit, Cobertura, generic JSON |
+| **Rate limits** | Yes on shields.io (no limits if self-hosted) | None |
+| **Preset badges** | Static badge only | build, coverage, version, license, custom, progress |
+| **Output** | Rendered in browser from URL | SVG string, file, or served from your own app |
+
+**Choose Shields.io if:**
+- You just need a few badges in a README and don't want to install anything
+- Your badge data is already exposed via a public API
+- You're comfortable with the hosted service's availability and rate limits
+
+**Choose badgepy if:**
+- You're generating badges in a CI/CD pipeline and want offline reliability
+- You need programmatic control over badge generation from Python
+- You're parsing local test/coverage reports (JUnit, Cobertura) into badges
+- You want to serve badges from your own application
+- You need zero network dependencies at badge generation time
+
+> 💡 **Already using Shields.io static badges?** See the [Shields.io Migration Guide](docs/shields-migration.md) for a drop-in replacement path.
 
 ## Sponsors
 
@@ -39,40 +62,37 @@ maintenance, please consider sponsoring the project through thanks.dev or
 
 ### Installing
 
-`badgepy` can be installed using [pip](https://pypi.org/project/pip/):
-
 ```sh
 pip install badgepy
 ```
 
-To test that installation was successful, try:
+Verify the installation:
+
 ```sh
 python -m badgepy --left-text=build --right-text=failure --right-color='#c00' --browser
 ```
 
-You will see a badge like this in your browser:
+You should see a badge like this in your browser:
 
 ![pip installation](tests/golden-images/build-failure.svg)
 
 ## Usage
 
-badgepy can be used both from the command line and as a Python library.
+badgepy can be used from the command line and as a Python library.
 
-The command line interface is a great way to experiment with the API before
-writing Python code.
+Prefer to start with the CLI? It's a great way to experiment before writing code.
+Prefer to see a running server? Check out the [example Flask server](server-example).
 
-You could also look at the [example server](https://github.com/shenxianpeng/badgepy/tree/main/server-example).
+### Command Line
 
-### Command line usage
-
-Complete documentation of badgepy command arguments can be found using the `--help`
-flag:
+Full documentation of all command-line arguments:
 
 ```sh
 badgepy --help
 ```
 
-But the following usage demonstrates every interesting option:
+A complete example demonstrating every option:
+
 ```sh
 badgepy \
     --left-text=complete \
@@ -91,9 +111,9 @@ badgepy \
 
 ![complete](tests/golden-images/complete.svg)
 
-#### A note about `--logo` and `--embed-logo`
+#### Logos
 
-Note that the `--logo` option can include a regular URL:
+The `--logo` option accepts a URL:
 
 ```sh
 badgepy \
@@ -106,14 +126,9 @@ badgepy \
 
 ![python](tests/golden-images/python.svg)
 
-If the `--logo` option is set, the `--embed-logo` option can also be set.
-The `--embed-logo` option causes the content of the URL provided in `--logo`
-to be embedded in the badge rather than be referenced through a link.
+Use `--embed-logo` to inline the logo data directly into the SVG, saving an HTTP request at render time. This is especially useful offline or in browsers that block external image references.
 
-The advantage of using this option is an extra HTTP request will not be required
-to render the badge and that some browsers will not load image references at all.
-
-![--embed-logo=yes](tests/golden-images/embedded-logo.svg) 
+![--embed-logo=yes](tests/golden-images/embedded-logo.svg)
 ![--embed-logo=no](tests/golden-images/no-embedded-logo.svg)
 
 Use `--logo-width` for wide custom logos and `--font-family` when you need a
@@ -129,35 +144,25 @@ badgepy \
     -o badges/downloads.svg
 ```
 
-#### A note about `--(whole|left|right)-title`
+#### Titles
 
-The `title` element is usually displayed as a
-[pop-up by browsers](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/title)
-but is currently
-[filtered by Github](https://github.com/github/markup/issues/1267).
+The `title` element is shown as a [tooltip by browsers](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/title) but is currently [filtered by GitHub](https://github.com/github/markup/issues/1267).
 
-### Library usage
-
-badgepy is primarily meant to be used as a Python library.
+### Library
 
 ```python
 from badgepy import badge
+
 s = badge(left_text='coverage', right_text='23%', right_color='red')
-# s is a string that contains the badge data as an svg image.
-print(s[:40]) # => <svg height="20" width="191.0" xmlns="ht
+# s is a string containing the badge as an SVG image.
+print(s[:40])  # => <svg height="20" width="191.0" xmlns="ht
 ```
 
-The keyword arguments to `badge()` are identical to the command flags names
-described above except with keyword arguments using underscore instead of
-hyphen/minus (e.g. `--left-text` => `left_text=`)
+Keyword arguments mirror the CLI flags, with underscores instead of hyphens (e.g. `--left-text` → `left_text=`).
 
-#### Server usage
+#### Serving Badges from a Web App
 
-badgepy can be used to serve badge images on the web.
-
-[server-example](https://github.com/shenxianpeng/badgepy/tree/main/server-example)
-contains an example of serving badge images from a
-[Flask server](https://flask.palletsprojects.com/).
+badgepy can be used to serve badge images on the web. See the [Flask example](server-example) for a minimal setup.
 
 Start the example server with:
 
@@ -169,7 +174,7 @@ Then open http://127.0.0.1:5000/ to view the badges.
 
 ### Preset Badges
 
-badgepy includes preset recipes for common badge types with automatic color coding:
+Common badge types with automatic color coding, no manual color picking needed:
 
 | Command | Preview |
 | ------- | ------- |
@@ -180,7 +185,7 @@ badgepy includes preset recipes for common badge types with automatic color codi
 | `badgepy preset custom "linux" --label platform --color green -o badges/platform.svg` | ![platform linux](badges/platform.svg) |
 | `badgepy preset progress 75 --label docs -o badges/docs.svg` | ![docs progress](badges/docs.svg) |
 
-Or from Python:
+From Python:
 
 ```python
 from badgepy.presets import build_badge, coverage_badge, custom_badge, progress_badge
@@ -193,7 +198,7 @@ svg = progress_badge(75, label='docs')
 
 ### CI Report Badges
 
-Generate badges directly from CI test and coverage reports:
+Generate badges directly from test and coverage report files — no external API needed:
 
 | Command | Preview |
 | ------- | ------- |
@@ -216,7 +221,7 @@ badgepy from-json coverage-summary.json \
     -o badges/coverage.svg
 ```
 
-Or from Python:
+From Python:
 
 ```python
 from badgepy.parsers import badges_from_junit, badges_from_coverage
@@ -227,9 +232,7 @@ badges = badges_from_coverage('tests/coverage.xml')    # {'coverage': '<svg...>'
 svg = badge_from_structured_data('pyproject.toml', query='project.version', label='pypi')
 ```
 
-See [CI Integration Guide](docs/ci-integration.md) for GitHub Actions, GitLab CI, and Jenkins examples.
-
-See [Shields.io Migration Guide](docs/shields-migration.md) to replace shields.io with badgepy.
+See the [CI Integration Guide](docs/ci-integration.md) for GitHub Actions, GitLab CI, and Jenkins examples.
 
 ### Output to File
 
@@ -239,26 +242,19 @@ Use `-o` / `--output` to write badges to a file instead of stdout:
 badgepy --left-text=build --right-text=passing --right-color=green -o badges/build.svg
 ```
 
-### Caveats
+## Caveats
 
- - badgepy uses a pre-calculated table of text widths and
-   [kerning](https://en.wikipedia.org/wiki/Kerning) distances
-   (for western glyphs) to determine the size of the badge.
-   So Eastern European languages may be rendered less well than
-   Western European ones.
+- **Text measurement**: badgepy uses a pre-calculated table of text widths and [kerning](https://en.wikipedia.org/wiki/Kerning) distances for western glyphs. Eastern European languages may not render as accurately:
 
-   ![saying-russian](tests/golden-images/saying-russian.svg)
+  ![saying-russian](tests/golden-images/saying-russian.svg)
 
-   and glyphs not present in Deja Vu Sans (the default font) may
-   be rendered very poorly.
+  Glyphs not present in Deja Vu Sans (the default font) may render poorly:
 
-   ![saying-chinese](tests/golden-images/saying-chinese.svg)
+  ![saying-chinese](tests/golden-images/saying-chinese.svg)
 
- - badgepy does not have any explicit support for languages that
-   are written right-to-left (e.g. Arabic, Hebrew) and the displayed
-   text direction may be incorrect.
+- **Right-to-left languages**: Arabic, Hebrew, and other RTL scripts are not explicitly supported; the text direction may be incorrect:
 
-   ![saying-arabic](tests/golden-images/saying-arabic.svg)
+  ![saying-arabic](tests/golden-images/saying-arabic.svg)
 
 ## Development
 
@@ -267,18 +263,16 @@ git clone https://github.com/shenxianpeng/badgepy.git
 cd badgepy
 python -m venv venv
 source venv/bin/activate
-# Installs in editable mode with development dependencies.
 pip install -e .[dev]
 nox
 ```
 
-If you'd like to contribute your changes back to badgepy, please read the
-[contributor guide.](CONTRIBUTING.md)
+Contributions are welcome! Please read the [contributor guide](CONTRIBUTING.md) before submitting a PR.
 
 ## Versioning
 
-We use [SemVer](http://semver.org/) for versioning.
+This project follows [SemVer](http://semver.org/).
 
 ## License
 
-This project is licensed under the Apache License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the Apache License — see the [LICENSE](LICENSE) file for details.
