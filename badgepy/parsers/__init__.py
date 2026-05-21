@@ -16,6 +16,13 @@
 from badgepy.parsers.junit import parse_junit, badges_from_junit
 from badgepy.parsers.coverage import parse_coverage, badges_from_coverage
 from badgepy.parsers.generic import parse_generic, badges_from_generic
+from badgepy.parsers.structured import (
+    badge_from_lock,
+    badge_from_structured_data,
+    load_structured_data,
+    package_from_lock,
+    select_value,
+)
 
 __all__ = [
     "parse_junit",
@@ -24,4 +31,9 @@ __all__ = [
     "badges_from_coverage",
     "parse_generic",
     "badges_from_generic",
+    "badge_from_lock",
+    "badge_from_structured_data",
+    "load_structured_data",
+    "package_from_lock",
+    "select_value",
 ]

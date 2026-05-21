@@ -18,6 +18,7 @@ badgepy can serve as a local replacement for shields.io static badges, giving yo
 | `https://img.shields.io/badge/version-v1.2.3-blue` | `badgepy preset version v1.2.3` |
 | `https://img.shields.io/badge/license-MIT-blue` | `badgepy preset license MIT` |
 | `https://img.shields.io/badge/any_label-any_message-orange` | `badgepy preset custom "any message" --label "any label" --color orange` |
+| `https://img.shields.io/badge/progress-75%25-green` | `badgepy preset progress 75 --label progress` |
 
 ## Python API mapping
 
@@ -63,6 +64,20 @@ badgepy from-coverage coverage.xml -o badges/coverage.svg
 
 # From generic key-value files
 badgepy from-generic metrics.json --output-dir badges/
+
+# From local JSON/TOML files without publishing a dynamic endpoint
+badgepy from-json package.json --query version --label npm -o badges/npm.svg
+badgepy from-pyproject --query project.name --label package -o badges/package.svg
+badgepy from-lock uv.lock jinja2 --label jinja2 -o badges/jinja2.svg
+badgepy from-json coverage-summary.json \
+    --query total.lines.pct \
+    --label coverage \
+    --template "{value}%" \
+    --thresholds "90:brightgreen,80:green,60:yellow,0:red" \
+    -o badges/coverage.svg
+
+# Optional badges can disappear instead of showing noisy upstream errors
+badgepy from-json optional-metrics.json --query downloads --on-error hide -o badges/downloads.svg
 ```
 
 ## Preset badges reference
@@ -71,6 +86,7 @@ badgepy from-generic metrics.json --output-dir badges/
 |---|---|---|
 | `build` | `badgepy preset build <status>` | passing=brightgreen, failing=red, error=red, pending=yellow |
 | `coverage` | `badgepy preset coverage <percentage>` | 90+=brightgreen, 80+=green, 70+=yellowgreen, 60+=yellow, 40+=orange, <40=red |
+| `progress` | `badgepy preset progress <percentage>` | 90+=brightgreen, 80+=green, 70+=yellowgreen, 60+=yellow, 40+=orange, <40=red |
 | `version` | `badgepy preset version <version>` | blue |
 | `license` | `badgepy preset license <license>` | blue |
 | `custom` | `badgepy preset custom <message> --label <label> --color <color>` | user-specified |

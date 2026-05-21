@@ -59,6 +59,23 @@ class TestbadgepyBadge(unittest.TestCase):
                 whole_link="http://example.com/",
             )
 
+    def test_font_family(self):
+        svg = badgepy.badge(
+            left_text="font",
+            right_text="custom",
+            font_family="Open Sans,sans-serif",
+        )
+        self.assertIn('font-family="Open Sans,sans-serif"', svg)
+
+    def test_logo_width(self):
+        svg = badgepy.badge(
+            left_text="logo",
+            right_text="wide",
+            logo="data:image/png;base64," + PNG_IMAGE_B64,
+            logo_width=28,
+        )
+        self.assertIn('width="28"', svg)
+
     def test_changes(self):
         with open(os.path.join(TEST_DIR, "test-badges.json"), "r") as f:
             examples = json.load(f)

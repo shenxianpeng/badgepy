@@ -116,6 +116,19 @@ to render the badge and that some browsers will not load image references at all
 ![--embed-logo=yes](tests/golden-images/embedded-logo.svg) 
 ![--embed-logo=no](tests/golden-images/no-embedded-logo.svg)
 
+Use `--logo-width` for wide custom logos and `--font-family` when you need a
+specific SVG font stack:
+
+```sh
+badgepy \
+    --left-text=downloads \
+    --right-text=2.7G \
+    --logo='data:image/svg+xml;base64,...' \
+    --logo-width=28 \
+    --font-family="Open Sans,sans-serif" \
+    -o badges/downloads.svg
+```
+
 #### A note about `--(whole|left|right)-title`
 
 The `title` element is usually displayed as a
@@ -165,15 +178,17 @@ badgepy includes preset recipes for common badge types with automatic color codi
 | `badgepy preset version v1.2.3 -o badges/version.svg` | ![version v1.2.3](badges/version.svg) |
 | `badgepy preset license MIT -o badges/license.svg` | ![license MIT](badges/license.svg) |
 | `badgepy preset custom "linux" --label platform --color green -o badges/platform.svg` | ![platform linux](badges/platform.svg) |
+| `badgepy preset progress 75 --label docs -o badges/docs.svg` | ![docs progress](badges/docs.svg) |
 
 Or from Python:
 
 ```python
-from badgepy.presets import build_badge, coverage_badge, custom_badge
+from badgepy.presets import build_badge, coverage_badge, custom_badge, progress_badge
 
 svg = build_badge('passing')
 svg = coverage_badge(85.3)
 svg = custom_badge(label='platform', message='linux', color='green')
+svg = progress_badge(75, label='docs')
 ```
 
 ### CI Report Badges
@@ -188,15 +203,28 @@ Generate badges directly from CI test and coverage reports:
 ```sh
 # From generic key-value or JSON files
 badgepy from-generic metrics.json --output-dir badges/
+
+# From structured local JSON/TOML files
+badgepy from-json package.json --query version --label npm -o badges/npm.svg
+badgepy from-pyproject --query project.name --label package -o badges/package.svg
+badgepy from-lock uv.lock jinja2 --label jinja2 -o badges/jinja2.svg
+badgepy from-json coverage-summary.json \
+    --query total.lines.pct \
+    --label coverage \
+    --template "{value}%" \
+    --thresholds "90:brightgreen,80:green,60:yellow,0:red" \
+    -o badges/coverage.svg
 ```
 
 Or from Python:
 
 ```python
 from badgepy.parsers import badges_from_junit, badges_from_coverage
+from badgepy.parsers.structured import badge_from_structured_data
 
 badges = badges_from_junit('tests/test-results.xml')   # {'tests': '<svg...>'}
 badges = badges_from_coverage('tests/coverage.xml')    # {'coverage': '<svg...>', 'branch-coverage': '<svg...>'}
+svg = badge_from_structured_data('pyproject.toml', query='project.version', label='pypi')
 ```
 
 See [CI Integration Guide](docs/ci-integration.md) for GitHub Actions, GitLab CI, and Jenkins examples.

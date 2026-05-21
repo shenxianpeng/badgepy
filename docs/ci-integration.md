@@ -46,10 +46,36 @@ This guide shows how to use badgepy in CI pipelines to automatically generate ba
 - name: Generate build badge
   run: badgepy preset build passing -o badges/build.svg
 
+- name: Generate progress badge
+  run: badgepy preset progress 75 --label docs -o badges/docs.svg
+
 - name: Generate version badge
   run: |
     VERSION=$(python -c 'import importlib.metadata as m; print(m.version("badgepy"))')
     badgepy preset version "$VERSION" -o badges/version.svg
+```
+
+### Generate badges from local JSON/TOML data
+
+```yaml
+- name: Generate package metadata badges
+  run: |
+    badgepy from-pyproject --query project.name --label package -o badges/package.svg
+    badgepy from-json package.json --query version --label npm -o badges/npm.svg
+    badgepy from-lock uv.lock jinja2 --label jinja2 -o badges/jinja2.svg
+```
+
+Use thresholds when the selected JSON/TOML value is numeric:
+
+```yaml
+- name: Generate coverage summary badge
+  run: |
+    badgepy from-json coverage-summary.json \
+      --query total.lines.pct \
+      --label coverage \
+      --template "{value}%" \
+      --thresholds "90:brightgreen,80:green,60:yellow,0:red" \
+      -o badges/coverage.svg
 ```
 
 ## GitLab CI

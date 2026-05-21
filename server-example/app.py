@@ -44,7 +44,11 @@ def _build_python_snippet(b):
     if b.get("right_color"):
         lines.append(f'    right_color="{b["right_color"]}",')
     if b.get("logo"):
-        logo_display = b["logo"] if not b["logo"].startswith("data:") else "data:image/png;base64,..."
+        logo_display = (
+            b["logo"]
+            if not b["logo"].startswith("data:")
+            else "data:image/png;base64,..."
+        )
         lines.append(f'    logo="{logo_display}",')
     lines.append(")")
     return "\n".join(lines)
@@ -88,8 +92,8 @@ def serve_badge():
     badge = badgepy.badge(
         left_text=flask.request.args.get("left_text"),
         right_text=flask.request.args.get("right_text"),
-        left_color=flask.request.args.get("left_color"),
-        right_color=flask.request.args.get("right_color"),
+        left_color=flask.request.args.get("left_color") or "#555",
+        right_color=flask.request.args.get("right_color") or "#007ec6",
         logo=flask.request.args.get("logo"),
     )
 
