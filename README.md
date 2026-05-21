@@ -1,13 +1,14 @@
 # badgepy
 
 [![CI](https://github.com/shenxianpeng/badgepy/actions/workflows/ci.yml/badge.svg)](https://github.com/shenxianpeng/badgepy/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/shenxianpeng/badgepy/branch/main/graph/badge.svg)](https://codecov.io/gh/shenxianpeng/badgepy)
+[![codecov](https://codecov.io/gh/shenxianpeng/badgepy/graph/badge.svg?token=CIU1XB5U2U)](https://codecov.io/gh/shenxianpeng/badgepy)
 [![pypi](https://img.shields.io/pypi/v/badgepy.svg)](https://pypi.org/project/badgepy/)
 ![versions](https://img.shields.io/pypi/pyversions/badgepy.svg)
 
-> **badgepy** is a fork of [google/pybadges](https://github.com/google/pybadges) with fixes including added support for Python 3.13 and 3.14, dropped Python 3.7/3.8 support, removal of deprecated `imghdr`, and replacement of `pkg_resources` — see [all changes](https://github.com/shenxianpeng/badgepy/pulls?q=is%3Apr+is%3Aclosed). This project is actively maintained.
+> [!NOTE]
+> **badgepy** is a fork of [google/pybadges](https://github.com/google/pybadges) with fixes including added support for Python 3.13 and 3.14, dropped Python 3.7/3.8 support, removal of deprecated `imghdr`, and replacement of `pkg_resources` and [many other fixes](https://github.com/shenxianpeng/badgepy/pulls?q=is%3Apr+is%3Aclosed). This project is actively maintained.
 
-badgepy is a Python library and command-line tool for generating GitHub-style badges as SVG images — no external service required. Badges are rendered locally, offline, and fully under your control.
+badgepy is a Python library and command-line tool for generating GitHub-style badges as SVG images — no external service required. Badges are rendered locally, offline, and fully under your control. It also provides a **local [shields.io](https://shields.io)-style badge generator** — generate badges from CI reports (JUnit, Cobertura), use preset recipes for build/coverage/version/license badges, and serve them via a Flask server, all without relying on external services.
 
 The visual design follows the [Shields specification](https://github.com/badges/shields/blob/master/spec/SPECIFICATION.md) and is compatible with [Shields.io](https://shields.io).
 
@@ -18,12 +19,12 @@ Both tools produce identical-looking badges, but they work very differently. Her
 | | [Shields.io](https://shields.io) | badgepy |
 |---|---|---|
 | **How it works** | HTTP service — you request a badge URL and get back an SVG | Python library/CLI — generates SVGs locally |
-| **Internet required** | Yes (or [self-host](https://github.com/badges/shields#self-hosting)) | No — works fully offline |
+| **Internet required** | Yes (or [self-host](https://github.com/badges/shields)) | No — works fully offline |
 | **Setup** | Zero — just use a URL in your README | `pip install badgepy` |
 | **Customization** | URL query parameters only | Full programmatic control in Python |
 | **CI integration** | Via shields.io endpoint JSON | Native parsers for JUnit, Cobertura, generic JSON |
 | **Rate limits** | Yes on shields.io (no limits if self-hosted) | None |
-| **Preset badges** | Static badge only | build, coverage, version, license, custom |
+| **Preset badges** | Static badge only | build, coverage, version, license, custom, progress |
 | **Output** | Rendered in browser from URL | SVG string, file, or served from your own app |
 
 **Choose Shields.io if:**
@@ -39,6 +40,23 @@ Both tools produce identical-looking badges, but they work very differently. Her
 - You need zero network dependencies at badge generation time
 
 > 💡 **Already using Shields.io static badges?** See the [Shields.io Migration Guide](docs/shields-migration.md) for a drop-in replacement path.
+
+## Sponsors
+
+<p align="center">
+  <a href="https://thanks.dev/r/canonical">
+    <img src="https://avatars.githubusercontent.com/u/53057619?s=200&v=4" alt="Canonical" width="180">
+  </a>
+</p>
+
+badgepy is supported by [Canonical](https://canonical.com/) through
+[thanks.dev](https://thanks.dev/r/canonical). Thank you, Canonical, for
+supporting open source maintainers and helping make continued maintenance of
+badgepy possible.
+
+If your team depends on badgepy or wants to support independent open source
+maintenance, please consider sponsoring the project through thanks.dev or
+[GitHub Sponsors](https://github.com/sponsors/shenxianpeng).
 
 ## Getting Started
 
@@ -113,6 +131,19 @@ Use `--embed-logo` to inline the logo data directly into the SVG, saving an HTTP
 ![--embed-logo=yes](tests/golden-images/embedded-logo.svg)
 ![--embed-logo=no](tests/golden-images/no-embedded-logo.svg)
 
+Use `--logo-width` for wide custom logos and `--font-family` when you need a
+specific SVG font stack:
+
+```sh
+badgepy \
+    --left-text=downloads \
+    --right-text=2.7G \
+    --logo='data:image/svg+xml;base64,...' \
+    --logo-width=28 \
+    --font-family="Open Sans,sans-serif" \
+    -o badges/downloads.svg
+```
+
 #### Titles
 
 The `title` element is shown as a [tooltip by browsers](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/title) but is currently [filtered by GitHub](https://github.com/github/markup/issues/1267).
@@ -131,59 +162,74 @@ Keyword arguments mirror the CLI flags, with underscores instead of hyphens (e.g
 
 #### Serving Badges from a Web App
 
-badgepy works well behind a web server. See the [Flask example](server-example) for a minimal setup.
+badgepy can be used to serve badge images on the web. See the [Flask example](server-example) for a minimal setup.
+
+Start the example server with:
+
+```sh
+nox -s serve
+```
+
+Then open http://127.0.0.1:5000/ to view the badges.
 
 ### Preset Badges
 
 Common badge types with automatic color coding, no manual color picking needed:
 
-```sh
-# Build status (auto-colored: passing=brightgreen, failing=red)
-badgepy preset build passing -o badges/build.svg
-
-# Coverage (auto-colored by percentage thresholds)
-badgepy preset coverage 85.3 -o badges/coverage.svg
-
-# Version and license
-badgepy preset version v1.2.3 -o badges/version.svg
-badgepy preset license MIT -o badges/license.svg
-
-# Custom badge (compatible with shields.io static badge format)
-badgepy preset custom "linux" --label platform --color green -o badges/platform.svg
-```
+| Command | Preview |
+| ------- | ------- |
+| `badgepy preset build passing -o badges/build.svg` | ![build passing](badges/build.svg) |
+| `badgepy preset coverage 85.3 -o badges/coverage.svg` | ![coverage 85.3%](badges/coverage.svg) |
+| `badgepy preset version v1.2.3 -o badges/version.svg` | ![version v1.2.3](badges/version.svg) |
+| `badgepy preset license MIT -o badges/license.svg` | ![license MIT](badges/license.svg) |
+| `badgepy preset custom "linux" --label platform --color green -o badges/platform.svg` | ![platform linux](badges/platform.svg) |
+| `badgepy preset progress 75 --label docs -o badges/docs.svg` | ![docs progress](badges/docs.svg) |
 
 From Python:
 
 ```python
-from badgepy.presets import build_badge, coverage_badge, custom_badge
+from badgepy.presets import build_badge, coverage_badge, custom_badge, progress_badge
 
 svg = build_badge('passing')
 svg = coverage_badge(85.3)
 svg = custom_badge(label='platform', message='linux', color='green')
+svg = progress_badge(75, label='docs')
 ```
 
 ### CI Report Badges
 
 Generate badges directly from test and coverage report files — no external API needed:
 
+| Command | Preview |
+| ------- | ------- |
+| `badgepy from-junit tests/test-results.xml -o badges/tests.svg` | ![tests](badges/tests.svg) |
+| `badgepy from-coverage tests/coverage.xml --output-dir badges/` | ![coverage](badges/coverage.svg) ![branch-coverage](badges/branch-coverage.svg) |
+
 ```sh
-# From JUnit XML (pytest, JUnit, Go, etc.)
-badgepy from-junit test-results.xml -o badges/tests.svg
-
-# From Cobertura XML (coverage.py, gcov, JaCoCo, etc.)
-badgepy from-coverage coverage.xml -o badges/coverage.svg
-
 # From generic key-value or JSON files
 badgepy from-generic metrics.json --output-dir badges/
+
+# From structured local JSON/TOML files
+badgepy from-json package.json --query version --label npm -o badges/npm.svg
+badgepy from-pyproject --query project.name --label package -o badges/package.svg
+badgepy from-lock uv.lock jinja2 --label jinja2 -o badges/jinja2.svg
+badgepy from-json coverage-summary.json \
+    --query total.lines.pct \
+    --label coverage \
+    --template "{value}%" \
+    --thresholds "90:brightgreen,80:green,60:yellow,0:red" \
+    -o badges/coverage.svg
 ```
 
 From Python:
 
 ```python
 from badgepy.parsers import badges_from_junit, badges_from_coverage
+from badgepy.parsers.structured import badge_from_structured_data
 
-badges = badges_from_junit('test-results.xml')   # {'tests': '<svg...>'}
-badges = badges_from_coverage('coverage.xml')    # {'coverage': '<svg...>', 'branch-coverage': '<svg...>'}
+badges = badges_from_junit('tests/test-results.xml')   # {'tests': '<svg...>'}
+badges = badges_from_coverage('tests/coverage.xml')    # {'coverage': '<svg...>', 'branch-coverage': '<svg...>'}
+svg = badge_from_structured_data('pyproject.toml', query='project.version', label='pypi')
 ```
 
 See the [CI Integration Guide](docs/ci-integration.md) for GitHub Actions, GitLab CI, and Jenkins examples.
@@ -229,4 +275,4 @@ This project follows [SemVer](http://semver.org/).
 
 ## License
 
-Apache License 2.0 — see [LICENSE](LICENSE) for details.
+This project is licensed under the Apache License — see the [LICENSE](LICENSE) file for details.

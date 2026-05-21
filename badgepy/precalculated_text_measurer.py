@@ -16,11 +16,10 @@
 Uses a precalculated set of metrics to calculate the string length.
 """
 
-import io
 import json
 import importlib.resources
 import lzma
-from typing import cast, Mapping, TextIO, Type
+from typing import cast, Mapping, TextIO
 
 from badgepy import text_measurer
 

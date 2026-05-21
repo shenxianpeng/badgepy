@@ -72,6 +72,15 @@ def compatibility(session, install):
     _run_tests(session)
 
 
+@nox.session
+def serve(session):
+    """Start the example Flask server at http://127.0.0.1:5000/."""
+    session.install("-e", ".")
+    session.install("flask")
+    session.chdir("server-example")
+    session.run("flask", "--app", "app.py", "run")
+
+
 @nox.session(python=["3.12"])
 def type_check(session):
     """Run type checking using pytype."""

@@ -98,7 +98,56 @@ def coverage_badge(
     '<svg...</svg>'
     """
     color = _color_for_coverage(percentage, thresholds)
-    right_text = f"{percentage:.1f}%" if percentage != int(percentage) else f"{int(percentage)}%"
+    right_text = (
+        f"{percentage:.1f}%" if percentage != int(percentage) else f"{int(percentage)}%"
+    )
+    return badgepy.badge(left_text=label, right_text=right_text, right_color=color)
+
+
+def progress_badge(
+    percentage: Optional[float] = None,
+    label: str = "progress",
+    numerator: Optional[float] = None,
+    denominator: Optional[float] = None,
+    message: Optional[str] = None,
+    thresholds: Optional[list[tuple[float, str]]] = None,
+) -> str:
+    """Generate a progress badge with coverage-style threshold colors.
+
+    Args:
+        percentage: Progress value. Values from 0.0 to 1.0 are treated as
+            fractions; values from 1 to 100 are treated as percentages.
+        label: Left-hand label text.
+        numerator: Optional numerator for fraction-based progress.
+        denominator: Optional denominator for fraction-based progress.
+        message: Optional right-hand text override.
+        thresholds: Optional list of (min_percentage, color) tuples.
+
+    Returns:
+        SVG string of the badge.
+    """
+    if percentage is None:
+        if numerator is None or denominator is None:
+            raise ValueError("percentage or numerator and denominator must be set")
+        if denominator == 0:
+            raise ValueError("denominator must not be zero")
+        percentage = (numerator / denominator) * 100
+    elif numerator is not None or denominator is not None:
+        raise ValueError("percentage cannot be set with numerator or denominator")
+
+    if 0 <= percentage <= 1:
+        percentage *= 100
+    if percentage < 0 or percentage > 100:
+        raise ValueError("percentage must be between 0 and 100")
+
+    color = _color_for_coverage(percentage, thresholds)
+    right_text = message
+    if right_text is None:
+        right_text = (
+            f"{percentage:.1f}%"
+            if percentage != int(percentage)
+            else f"{int(percentage)}%"
+        )
     return badgepy.badge(left_text=label, right_text=right_text, right_color=color)
 
 
@@ -182,3 +231,17 @@ def tests_badge(passed: int, failed: int, skipped: int = 0) -> str:
         color = "brightgreen"
 
     return badgepy.badge(left_text="tests", right_text=right_text, right_color=color)
+
+
+def error_badge(
+    label: str,
+    message: str = "unknown",
+    color: str = "lightgrey",
+) -> str:
+    """Generate a neutral fallback badge for data extraction failures."""
+    return badgepy.badge(left_text=label, right_text=message, right_color=color)
+
+
+def empty_badge() -> str:
+    """Generate a zero-size SVG for optional badges that should disappear."""
+    return '<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0"/>'

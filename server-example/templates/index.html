@@ -4,39 +4,62 @@
     <title>badgepy demo</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400&display=swap" rel="stylesheet">
     <style>
-        table {
-            font-family: 'Roboto Mono', monospace;
-            border-spacing: 1em;
-            text-align: left;
-            border-collapse: separate;
+        body {
+            font-family: sans-serif;
+            padding: 2em;
         }
 
-        img {
-            padding-left: 5em;
+        .badge-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 2em;
+            margin-bottom: 2.5em;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 2em;
+        }
+
+        .badge-preview {
+            flex-shrink: 0;
+            padding-top: 0.4em;
+        }
+
+        .badge-snippets {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.85em;
+        }
+
+        .snippet-label {
+            color: #888;
+            font-size: 0.8em;
+            margin-bottom: 0.2em;
+            margin-top: 0.8em;
+        }
+
+        pre {
+            background: #f5f5f5;
+            padding: 0.8em 1em;
+            border-radius: 4px;
+            margin: 0;
+            white-space: pre-wrap;
         }
     </style>
 </head>
 
 <body>
-    <table>
-        <tbody>
-            {% for badge in badges %}
-            <tr>
-                <td>
-                    <pre>
-badgepy(left_text="{{ badge.left_text }}",
-         right_text="{{ badge.right_text }}",
-         left_color="{{ badge.left_color }}",
-         right_color="{{ badge.right_color}}",
-         logo={{ '"' ~ badge.logo ~ '"' if badge.logo else "None" }})
-
-</pre>
-                </td>
-            </tr>
-            <td><img src={{ badge.url }}></td>
-        </tbody>
-        {% endfor %}
-    </table>
+    <h2>badgepy demo</h2>
+    {% for badge in badges %}
+    <div class="badge-row">
+        <div class="badge-snippets">
+            <div class="snippet-label">Python API</div>
+            <pre>{{ badge.python_snippet }}</pre>
+            <div class="snippet-label">CLI</div>
+            <pre>{{ badge.cli_cmd }}</pre>
+        </div>
+        <div class="badge-preview">
+            <img src="{{ badge.url }}">
+        </div>
+    </div>
+    {% endfor %}
 </body>
 
 </html>
