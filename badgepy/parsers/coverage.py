@@ -26,7 +26,6 @@ Example Cobertura XML structure::
 import os
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
-from typing import Optional, Union
 
 from badgepy.presets import coverage_badge
 
@@ -36,20 +35,20 @@ class CoverageResult:
     """Parsed coverage results."""
 
     line_rate: float
-    branch_rate: Optional[float]
+    branch_rate: float | None
 
     @property
     def line_percentage(self) -> float:
         return self.line_rate * 100
 
     @property
-    def branch_percentage(self) -> Optional[float]:
+    def branch_percentage(self) -> float | None:
         if self.branch_rate is not None:
             return self.branch_rate * 100
         return None
 
 
-def parse_coverage(source: Union[str, "os.PathLike[str]"]) -> CoverageResult:
+def parse_coverage(source: str | os.PathLike[str]) -> CoverageResult:
     """Parse a Cobertura XML coverage file.
 
     Args:
@@ -71,7 +70,7 @@ def parse_coverage(source: Union[str, "os.PathLike[str]"]) -> CoverageResult:
     return CoverageResult(line_rate=line_rate, branch_rate=branch_rate)
 
 
-def badges_from_coverage(source: Union[str, "os.PathLike[str]"]) -> dict[str, str]:
+def badges_from_coverage(source: str | os.PathLike[str]) -> dict[str, str]:
     """Parse a Cobertura XML file and generate badge SVGs.
 
     Args:

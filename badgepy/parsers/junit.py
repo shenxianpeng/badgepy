@@ -28,7 +28,6 @@ Example JUnit XML structure::
 import os
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
-from typing import Union
 
 from badgepy.presets import tests_badge
 
@@ -47,7 +46,7 @@ class JUnitResult:
         return self.tests - self.failures - self.errors - self.skipped
 
 
-def parse_junit(source: Union[str, "os.PathLike[str]"]) -> JUnitResult:
+def parse_junit(source: str | os.PathLike[str]) -> JUnitResult:
     """Parse a JUnit XML file and extract test counts.
 
     Args:
@@ -85,7 +84,7 @@ def parse_junit(source: Union[str, "os.PathLike[str]"]) -> JUnitResult:
     )
 
 
-def badges_from_junit(source: Union[str, "os.PathLike[str]"]) -> dict[str, str]:
+def badges_from_junit(source: str | os.PathLike[str]) -> dict[str, str]:
     """Parse a JUnit XML file and generate badge SVGs.
 
     Args:

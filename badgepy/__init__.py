@@ -31,7 +31,6 @@ gh-badges library
 
 import base64
 import mimetypes
-from typing import Optional
 import urllib.parse
 from xml.dom import minidom
 
@@ -125,22 +124,22 @@ def _normalize_color(color: str) -> str:
 
 def badge(
     left_text: str,
-    right_text: Optional[str] = None,
-    left_link: Optional[str] = None,
-    right_link: Optional[str] = None,
-    center_link: Optional[str] = None,
-    whole_link: Optional[str] = None,
-    logo: Optional[str] = None,
-    left_color: Optional[str] = "#555",
-    right_color: Optional[str] = "#007ec6",
-    center_color: Optional[str] = None,
-    measurer: Optional[text_measurer.TextMeasurer] = None,
-    left_title: Optional[str] = None,
-    right_title: Optional[str] = None,
-    center_title: Optional[str] = None,
-    whole_title: Optional[str] = None,
-    right_image: Optional[str] = None,
-    center_image: Optional[str] = None,
+    right_text: str | None = None,
+    left_link: str | None = None,
+    right_link: str | None = None,
+    center_link: str | None = None,
+    whole_link: str | None = None,
+    logo: str | None = None,
+    left_color: str | None = "#555",
+    right_color: str | None = "#007ec6",
+    center_color: str | None = None,
+    measurer: text_measurer.TextMeasurer | None = None,
+    left_title: str | None = None,
+    right_title: str | None = None,
+    center_title: str | None = None,
+    whole_title: str | None = None,
+    right_image: str | None = None,
+    center_image: str | None = None,
     embed_logo: bool = False,
     embed_right_image: bool = False,
     embed_center_image: bool = False,
