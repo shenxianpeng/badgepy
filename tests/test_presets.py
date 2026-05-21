@@ -22,6 +22,7 @@ from badgepy.presets import (
     version_badge,
     license_badge,
     custom_badge,
+    progress_badge,
     _color_for_coverage,
 )
 
@@ -61,6 +62,41 @@ class TestCoverageBadge(unittest.TestCase):
     def test_integer_coverage(self):
         svg = coverage_badge(80.0)
         self.assertIn("80%", svg)
+
+
+class TestProgressBadge(unittest.TestCase):
+    def test_percentage(self):
+        svg = progress_badge(75)
+        self.assertIn("75%", svg)
+        self.assertIn("progress", svg)
+
+    def test_fraction_percentage(self):
+        svg = progress_badge(0.5)
+        self.assertIn("50%", svg)
+
+    def test_numerator_denominator(self):
+        svg = progress_badge(numerator=3, denominator=4)
+        self.assertIn("75%", svg)
+
+    def test_message_override(self):
+        svg = progress_badge(75, message="documented")
+        self.assertIn("documented", svg)
+
+    def test_requires_value(self):
+        with self.assertRaises(ValueError):
+            progress_badge()
+
+    def test_rejects_mixed_percentage_and_fraction(self):
+        with self.assertRaises(ValueError):
+            progress_badge(75, numerator=3, denominator=4)
+
+    def test_rejects_zero_denominator(self):
+        with self.assertRaises(ValueError):
+            progress_badge(numerator=3, denominator=0)
+
+    def test_rejects_out_of_range_percentage(self):
+        with self.assertRaises(ValueError):
+            progress_badge(101)
 
 
 class TestColorForCoverage(unittest.TestCase):
@@ -108,6 +144,19 @@ class TestTestsBadge(unittest.TestCase):
         svg = presets.tests_badge(7, 0, 3)
         self.assertIn("7 passed", svg)
         self.assertIn("3 skipped", svg)
+
+
+class TestFallbackBadges(unittest.TestCase):
+    def test_error_badge(self):
+        svg = presets.error_badge("downloads", message="unknown")
+        self.assertIn("downloads", svg)
+        self.assertIn("unknown", svg)
+
+    def test_empty_badge(self):
+        self.assertEqual(
+            presets.empty_badge(),
+            '<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0"/>',
+        )
 
 
 if __name__ == "__main__":

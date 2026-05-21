@@ -140,6 +140,8 @@ def badge(
     embed_right_image: bool = False,
     embed_center_image: bool = False,
     id_suffix: str = "",
+    logo_width: float = 14,
+    font_family: str = "DejaVu Sans,Verdana,Geneva,sans-serif",
 ) -> str:
     """Creates a github-style badge as an SVG image.
 
@@ -190,6 +192,8 @@ def badge(
         id_suffix: The suffix of the id attributes used in the SVG's elements.
             Use to prevent duplicate ids if several badges are embedded on the
             same page.
+        logo_width: Width of the logo image in SVG units. Defaults to 14.
+        font_family: SVG font-family value for badge text.
     """
     if measurer is None:
         measurer = precalculated_text_measurer.PrecalculatedTextMeasurer.default()
@@ -243,6 +247,8 @@ def badge(
         right_image=right_image,
         center_image=center_image,
         id_suffix=id_suffix,
+        logo_width=logo_width,
+        font_family=font_family,
     )
     xml = minidom.parseString(svg)
     _remove_blanks(xml)

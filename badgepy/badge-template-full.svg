@@ -1,4 +1,4 @@
-{% set logo_width = 14 if logo else 0 %}
+{% set logo_width = logo_width if logo else 0 %}
 {% set logo_padding = 3 if (logo and left_text) else 0 %}
 {% set image_width = 107 if center_image else 0 %}
 {% set left_width = left_text_width + 10 + logo_width + logo_padding %}
@@ -44,7 +44,7 @@
     <rect width="{{ left_width + right_width }}" height="20" fill="url(#{{ id_smooth }})"/>
   </g>
 
-  <g fill="#fff" text-anchor="middle" font-family="DejaVu Sans,Verdana,Geneva,sans-serif" font-size="110">
+  <g fill="#fff" text-anchor="middle" font-family="{{ font_family }}" font-size="110">
     {% if logo %}
       <image x="5" y="3" width="{{ logo_width }}" height="14" xlink:href="{{ logo}}"/>
     {% endif %}

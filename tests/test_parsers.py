@@ -21,6 +21,17 @@ import unittest
 from badgepy.parsers.junit import parse_junit, badges_from_junit
 from badgepy.parsers.coverage import parse_coverage, badges_from_coverage
 from badgepy.parsers.generic import parse_generic, badges_from_generic
+from badgepy.parsers.structured import (
+    _parse_basic_toml,
+    badge_from_lock,
+    badge_from_structured_data,
+    color_for_value,
+    load_structured_data,
+    package_from_lock,
+    parse_thresholds,
+    render_template,
+    select_value,
+)
 
 
 class TestJUnitParser(unittest.TestCase):
@@ -201,6 +212,155 @@ class TestGenericParser(unittest.TestCase):
             self.assertIn("lint", badges)
             self.assertIn("warnings", badges)
             self.assertIn("<svg", badges["lint"])
+        finally:
+            os.unlink(path)
+
+
+class TestStructuredParser(unittest.TestCase):
+    def _write_temp(self, content: str, suffix: str) -> str:
+        fd, path = tempfile.mkstemp(suffix=suffix)
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
+            f.write(content)
+        return path
+
+    def test_json_query(self):
+        data = {"project": {"version": "1.2.3"}, "items": [{"name": "first"}]}
+        path = self._write_temp(json.dumps(data), ".json")
+        try:
+            result = load_structured_data(path)
+            self.assertEqual(select_value(result, "project.version"), "1.2.3")
+            self.assertEqual(select_value(result, "items[0].name"), "first")
+        finally:
+            os.unlink(path)
+
+    def test_toml_query(self):
+        path = self._write_temp(
+            '[project]\nname = "badgepy"\nversion = "1.2.3"\n',
+            ".toml",
+        )
+        try:
+            result = load_structured_data(path)
+            self.assertEqual(select_value(result, "project.name"), "badgepy")
+            self.assertEqual(select_value(result, "project.version"), "1.2.3")
+        finally:
+            os.unlink(path)
+
+    def test_basic_toml_fallback_sections_and_arrays(self):
+        result = _parse_basic_toml(
+            """
+            [project]
+            name = "badgepy"
+            classifiers = ["Framework :: Pytest", "Typing :: Typed"]
+
+            [[package]]
+            name = "jinja2"
+            version = "3.1.6"
+
+            [[package]]
+            name = "ruff"
+            version = "0.14.6"
+            """
+        )
+        self.assertEqual(result["project"]["name"], "badgepy")
+        self.assertEqual(result["project"]["classifiers"][1], "Typing :: Typed")
+        self.assertEqual(result["package"][0]["name"], "jinja2")
+        self.assertEqual(result["package"][1]["version"], "0.14.6")
+
+    def test_template(self):
+        data = {"project": {"name": "badgepy", "version": "1.2.3"}}
+        message = render_template(
+            "{project.name} {value}",
+            data,
+            select_value(data, "project.version"),
+        )
+        self.assertEqual(message, "badgepy 1.2.3")
+
+    def test_thresholds(self):
+        self.assertEqual(
+            parse_thresholds("90:brightgreen,60:yellow,0:red"),
+            [(90.0, "brightgreen"), (60.0, "yellow"), (0.0, "red")],
+        )
+
+    def test_invalid_threshold(self):
+        with self.assertRaises(ValueError):
+            parse_thresholds("90-green")
+
+    def test_color_for_value(self):
+        thresholds = parse_thresholds("90:brightgreen,80:green,0:red")
+        self.assertEqual(color_for_value(85, thresholds), "green")
+        self.assertIsNone(color_for_value(85, None))
+
+    def test_badge_from_structured_data(self):
+        path = self._write_temp('{"coverage": 87.5}', ".json")
+        try:
+            svg = badge_from_structured_data(
+                path,
+                label="coverage",
+                query="coverage",
+                template="{value}%",
+                thresholds="90:brightgreen,80:green,0:red",
+            )
+            self.assertIn("coverage", svg)
+            self.assertIn("87.5%", svg)
+            self.assertIn("#97CA00", svg)
+        finally:
+            os.unlink(path)
+
+    def test_unsupported_structured_format(self):
+        path = self._write_temp("coverage: 87.5", ".yaml")
+        try:
+            with self.assertRaises(ValueError):
+                load_structured_data(path)
+        finally:
+            os.unlink(path)
+
+    def test_missing_query_component(self):
+        with self.assertRaises(KeyError):
+            select_value({"project": {"name": "badgepy"}}, "project.version")
+
+    def test_index_query_requires_list(self):
+        with self.assertRaises(TypeError):
+            select_value({"project": {"name": "badgepy"}}, "project[0].name")
+
+    def test_lock_package(self):
+        path = self._write_temp(
+            '[[package]]\nname = "jinja2"\nversion = "3.1.6"\n',
+            ".lock",
+        )
+        try:
+            package = package_from_lock(path, "Jinja2")
+            self.assertEqual(package["version"], "3.1.6")
+        finally:
+            os.unlink(path)
+
+    def test_badge_from_lock(self):
+        path = self._write_temp(
+            '[[package]]\nname = "ruff"\nversion = "0.14.6"\n',
+            ".lock",
+        )
+        try:
+            svg = badge_from_lock(path, "ruff")
+            self.assertIn("ruff", svg)
+            self.assertIn("0.14.6", svg)
+        finally:
+            os.unlink(path)
+
+    def test_lock_package_missing(self):
+        path = self._write_temp(
+            '[[package]]\nname = "ruff"\nversion = "0.14.6"\n',
+            ".lock",
+        )
+        try:
+            with self.assertRaises(KeyError):
+                package_from_lock(path, "jinja2")
+        finally:
+            os.unlink(path)
+
+    def test_lock_without_package_entries(self):
+        path = self._write_temp("[project]\nname = 'badgepy'\n", ".lock")
+        try:
+            with self.assertRaises(ValueError):
+                package_from_lock(path, "jinja2")
         finally:
             os.unlink(path)
 

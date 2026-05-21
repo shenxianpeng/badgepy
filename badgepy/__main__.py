@@ -101,6 +101,8 @@ def _cmd_badge(args: argparse.Namespace) -> None:
         embed_logo=args.embed_logo,
         embed_right_image=args.embed_right_image,
         embed_center_image=args.embed_center_image,
+        logo_width=args.logo_width,
+        font_family=args.font_family,
     )
     _output_badge(badge, args)
 
@@ -111,7 +113,19 @@ def _cmd_preset(args: argparse.Namespace) -> None:
 
     preset_type = args.preset_type
 
-    if preset_type == "build":
+    if preset_type == "progress":
+        value = float(args.value) if args.value is not None else None
+        svg = presets.progress_badge(
+            value,
+            label=args.label or "progress",
+            numerator=args.numerator,
+            denominator=args.denominator,
+            message=args.message,
+        )
+    elif args.value is None:
+        print(f"preset {preset_type!r} requires a value", file=sys.stderr)
+        sys.exit(1)
+    elif preset_type == "build":
         svg = presets.build_badge(args.value, label=args.label or "build")
     elif preset_type == "coverage":
         svg = presets.coverage_badge(float(args.value), label=args.label or "coverage")
@@ -186,6 +200,61 @@ def _cmd_from_generic(args: argparse.Namespace) -> None:
             print(svg)
 
 
+def _fallback_badge(args: argparse.Namespace) -> str:
+    """Generate the configured fallback badge for structured data errors."""
+    from badgepy.presets import empty_badge, error_badge
+
+    if args.on_error == "hide":
+        return empty_badge()
+    label = args.label or args.query or "badge"
+    return error_badge(label=label, message=args.error_message, color=args.error_color)
+
+
+def _cmd_from_structured(args: argparse.Namespace, input_format: str) -> None:
+    """Generate a badge from JSON or TOML data."""
+    from badgepy.parsers.structured import badge_from_structured_data
+
+    try:
+        svg = badge_from_structured_data(
+            args.file,
+            label=args.label,
+            query=args.query,
+            color=args.color or "blue",
+            template=args.template,
+            thresholds=args.thresholds,
+            input_format=input_format,
+        )
+    except Exception as exc:
+        if args.on_error == "raise":
+            print(f"failed to generate badge: {exc}", file=sys.stderr)
+            sys.exit(1)
+        svg = _fallback_badge(args)
+
+    _output_badge(svg, args)
+
+
+def _cmd_from_lock(args: argparse.Namespace) -> None:
+    """Generate a package badge from a uv.lock or poetry.lock file."""
+    from badgepy.parsers.structured import badge_from_lock
+
+    try:
+        svg = badge_from_lock(
+            args.file,
+            args.package,
+            label=args.label,
+            color=args.color or "blue",
+            template=args.template,
+        )
+    except Exception as exc:
+        if args.on_error == "raise":
+            print(f"failed to generate badge: {exc}", file=sys.stderr)
+            sys.exit(1)
+        args.query = args.package
+        svg = _fallback_badge(args)
+
+    _output_badge(svg, args)
+
+
 def main():
     parser = argparse.ArgumentParser(
         "badgepy",
@@ -236,6 +305,17 @@ def main():
     )
     parser.add_argument(
         "--logo", default=None, help="a URI reference to a logo to display in the badge"
+    )
+    parser.add_argument(
+        "--logo-width",
+        type=float,
+        default=14,
+        help="the SVG width to use for the logo image",
+    )
+    parser.add_argument(
+        "--font-family",
+        default="DejaVu Sans,Verdana,Geneva,sans-serif",
+        help="the SVG font-family value for badge text",
     )
     parser.add_argument(
         "--left-color",
@@ -331,11 +411,12 @@ def main():
     )
     preset_parser.add_argument(
         "preset_type",
-        choices=["build", "coverage", "version", "license", "custom"],
+        choices=["build", "coverage", "version", "license", "custom", "progress"],
         help="the type of preset badge to generate",
     )
     preset_parser.add_argument(
         "value",
+        nargs="?",
         help="the value for the badge (e.g. 'passing', '85.3', 'v1.0.0')",
     )
     preset_parser.add_argument(
@@ -347,6 +428,23 @@ def main():
         "--color",
         default=None,
         help="override the badge color (for custom preset)",
+    )
+    preset_parser.add_argument(
+        "--numerator",
+        type=float,
+        default=None,
+        help="numerator for progress badges",
+    )
+    preset_parser.add_argument(
+        "--denominator",
+        type=float,
+        default=None,
+        help="denominator for progress badges",
+    )
+    preset_parser.add_argument(
+        "--message",
+        default=None,
+        help="override the right-hand text for progress badges",
     )
     _add_output_args(preset_parser)
 
@@ -361,11 +459,14 @@ def main():
         help="path to the JUnit XML file",
     )
     junit_parser.add_argument(
-        "-o", "--output", default=None,
+        "-o",
+        "--output",
+        default=None,
         help="write the badge to a file",
     )
     junit_parser.add_argument(
-        "--output-dir", default=None,
+        "--output-dir",
+        default=None,
         help="write all badges to a directory",
     )
 
@@ -380,11 +481,14 @@ def main():
         help="path to the Cobertura XML file",
     )
     cov_parser.add_argument(
-        "-o", "--output", default=None,
+        "-o",
+        "--output",
+        default=None,
         help="write the badge to a file",
     )
     cov_parser.add_argument(
-        "--output-dir", default=None,
+        "--output-dir",
+        default=None,
         help="write all badges to a directory",
     )
 
@@ -399,13 +503,171 @@ def main():
         help="path to the key-value or JSON file",
     )
     generic_parser.add_argument(
-        "--output-dir", default=None,
+        "--output-dir",
+        default=None,
         help="write all badges to a directory",
     )
     generic_parser.add_argument(
-        "--color", default=None,
+        "--color",
+        default=None,
         help="badge color (default: blue)",
     )
+
+    def add_structured_parser(name: str, fmt: str) -> None:
+        structured_parser = subparsers.add_parser(
+            name,
+            help=f"generate a badge from a {fmt.upper()} file",
+            description=f"Select data from a local {fmt.upper()} file and render a badge.",
+        )
+        structured_parser.add_argument(
+            "file",
+            help=f"path to the {fmt.upper()} file",
+        )
+        structured_parser.add_argument(
+            "--query",
+            default=None,
+            help="dot path to select, e.g. project.version or items[0].name",
+        )
+        structured_parser.add_argument(
+            "--label",
+            default=None,
+            help="left-hand badge label",
+        )
+        structured_parser.add_argument(
+            "--template",
+            default=None,
+            help="right-hand template using {value} or input paths",
+        )
+        structured_parser.add_argument(
+            "--thresholds",
+            default=None,
+            help="numeric color thresholds, e.g. 90:brightgreen,60:yellow,0:red",
+        )
+        structured_parser.add_argument(
+            "--color",
+            default=None,
+            help="badge color when thresholds do not apply (default: blue)",
+        )
+        structured_parser.add_argument(
+            "--on-error",
+            choices=["raise", "badge", "hide"],
+            default="raise",
+            help="how to handle parse/query errors",
+        )
+        structured_parser.add_argument(
+            "--error-message",
+            default="unknown",
+            help="fallback badge message for --on-error=badge",
+        )
+        structured_parser.add_argument(
+            "--error-color",
+            default="lightgrey",
+            help="fallback badge color for --on-error=badge",
+        )
+        _add_output_args(structured_parser)
+
+    add_structured_parser("from-json", "json")
+    add_structured_parser("from-toml", "toml")
+
+    pyproject_parser = subparsers.add_parser(
+        "from-pyproject",
+        help="generate a badge from pyproject.toml",
+        description="Select data from pyproject.toml and render a badge.",
+    )
+    pyproject_parser.add_argument(
+        "file",
+        nargs="?",
+        default="pyproject.toml",
+        help="path to pyproject.toml (default: pyproject.toml)",
+    )
+    pyproject_parser.add_argument(
+        "--query",
+        default="project.version",
+        help="dot path to select (default: project.version)",
+    )
+    pyproject_parser.add_argument(
+        "--label",
+        default="version",
+        help="left-hand badge label (default: version)",
+    )
+    pyproject_parser.add_argument(
+        "--template",
+        default=None,
+        help="right-hand template using {value} or input paths",
+    )
+    pyproject_parser.add_argument(
+        "--thresholds",
+        default=None,
+        help="numeric color thresholds, e.g. 90:brightgreen,60:yellow,0:red",
+    )
+    pyproject_parser.add_argument(
+        "--color",
+        default=None,
+        help="badge color when thresholds do not apply (default: blue)",
+    )
+    pyproject_parser.add_argument(
+        "--on-error",
+        choices=["raise", "badge", "hide"],
+        default="raise",
+        help="how to handle parse/query errors",
+    )
+    pyproject_parser.add_argument(
+        "--error-message",
+        default="unknown",
+        help="fallback badge message for --on-error=badge",
+    )
+    pyproject_parser.add_argument(
+        "--error-color",
+        default="lightgrey",
+        help="fallback badge color for --on-error=badge",
+    )
+    _add_output_args(pyproject_parser)
+
+    lock_parser = subparsers.add_parser(
+        "from-lock",
+        help="generate a package version badge from uv.lock or poetry.lock",
+        description="Find a package in a local uv.lock or poetry.lock file.",
+    )
+    lock_parser.add_argument(
+        "file",
+        help="path to uv.lock or poetry.lock",
+    )
+    lock_parser.add_argument(
+        "package",
+        help="package name to read from the lock file",
+    )
+    lock_parser.add_argument(
+        "--label",
+        default=None,
+        help="left-hand badge label (default: package name)",
+    )
+    lock_parser.add_argument(
+        "--template",
+        default=None,
+        help="right-hand template using {value} or package fields",
+    )
+    lock_parser.add_argument(
+        "--color",
+        default=None,
+        help="badge color (default: blue)",
+    )
+    lock_parser.add_argument(
+        "--on-error",
+        choices=["raise", "badge", "hide"],
+        default="raise",
+        help="how to handle missing package or parse errors",
+    )
+    lock_parser.add_argument(
+        "--error-message",
+        default="unknown",
+        help="fallback badge message for --on-error=badge",
+    )
+    lock_parser.add_argument(
+        "--error-color",
+        default="lightgrey",
+        help="fallback badge color for --on-error=badge",
+    )
+    _add_output_args(lock_parser)
 
     args = parser.parse_args()
 
@@ -420,6 +682,14 @@ def main():
         _cmd_from_coverage(args)
     elif args.command == "from-generic":
         _cmd_from_generic(args)
+    elif args.command == "from-json":
+        _cmd_from_structured(args, "json")
+    elif args.command == "from-toml":
+        _cmd_from_structured(args, "toml")
+    elif args.command == "from-pyproject":
+        _cmd_from_structured(args, "toml")
+    elif args.command == "from-lock":
+        _cmd_from_lock(args)
 
 
 if __name__ == "__main__":
