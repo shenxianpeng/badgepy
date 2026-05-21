@@ -18,6 +18,23 @@ The implementation of the library was heavily influenced by
 [Shields.io](https://github.com/badges/shields) and the JavaScript
 [badge-maker](https://github.com/badges/shields/tree/master/badge-maker#badge-maker) library.
 
+## Sponsors
+
+<p align="center">
+  <a href="https://thanks.dev/r/canonical">
+    <img src="https://avatars.githubusercontent.com/u/53057619?s=200&v=4" alt="Canonical" width="180">
+  </a>
+</p>
+
+badgepy is supported by [Canonical](https://canonical.com/) through
+[thanks.dev](https://thanks.dev/r/canonical). Thank you, Canonical, for
+supporting open source maintainers and helping make continued maintenance of
+badgepy possible.
+
+If your team depends on badgepy or wants to support independent open source
+maintenance, please consider sponsoring the project through thanks.dev or
+[GitHub Sponsors](https://github.com/sponsors/shenxianpeng).
+
 ## Getting Started
 
 ### Installing
