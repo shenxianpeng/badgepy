@@ -22,8 +22,6 @@ sensible defaults for colors and labels.
 '<svg...</svg>'
 """
 
-from typing import Optional
-
 import badgepy
 
 # Status-to-color mappings for build badges
@@ -49,7 +47,7 @@ _DEFAULT_COVERAGE_THRESHOLDS = [
 
 def _color_for_coverage(
     percentage: float,
-    thresholds: Optional[list[tuple[float, str]]] = None,
+    thresholds: list[tuple[float, str]] | None = None,
 ) -> str:
     """Determine the badge color based on coverage percentage."""
     if thresholds is None:
@@ -80,7 +78,7 @@ def build_badge(status: str, label: str = "build") -> str:
 def coverage_badge(
     percentage: float,
     label: str = "coverage",
-    thresholds: Optional[list[tuple[float, str]]] = None,
+    thresholds: list[tuple[float, str]] | None = None,
 ) -> str:
     """Generate a coverage badge with automatic color based on percentage.
 
@@ -105,12 +103,12 @@ def coverage_badge(
 
 
 def progress_badge(
-    percentage: Optional[float] = None,
+    percentage: float | None = None,
     label: str = "progress",
-    numerator: Optional[float] = None,
-    denominator: Optional[float] = None,
-    message: Optional[str] = None,
-    thresholds: Optional[list[tuple[float, str]]] = None,
+    numerator: float | None = None,
+    denominator: float | None = None,
+    message: str | None = None,
+    thresholds: list[tuple[float, str]] | None = None,
 ) -> str:
     """Generate a progress badge with coverage-style threshold colors.
 

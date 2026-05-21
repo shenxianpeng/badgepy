@@ -16,7 +16,7 @@
 import json
 import os
 import re
-from typing import Any, Optional, Union, cast
+from typing import Any, cast
 
 from badgepy.presets import custom_badge
 
@@ -154,8 +154,8 @@ def _parse_basic_toml(content: str) -> dict[str, Any]:
 
 
 def load_structured_data(
-    source: Union[str, "os.PathLike[str]"],
-    input_format: Optional[str] = None,
+    source: str | os.PathLike[str],
+    input_format: str | None = None,
 ) -> Any:
     """Load JSON or TOML from a local file."""
     path = os.fspath(source)
@@ -170,7 +170,7 @@ def load_structured_data(
     raise ValueError(f"unsupported structured data format: {fmt}")
 
 
-def select_value(data: Any, query: Optional[str] = None) -> Any:
+def select_value(data: Any, query: str | None = None) -> Any:
     """Select a value with a small dot-and-index path syntax.
 
     Examples: ``project.version``, ``items[0].name``, ``tool.badge.status``.
@@ -208,7 +208,7 @@ def stringify_value(value: Any) -> str:
     return str(value)
 
 
-def render_template(template: Optional[str], data: Any, selected_value: Any) -> str:
+def render_template(template: str | None, data: Any, selected_value: Any) -> str:
     """Render a badge message template.
 
     ``{value}`` expands to the selected query value. Other fields are treated
@@ -226,7 +226,7 @@ def render_template(template: Optional[str], data: Any, selected_value: Any) -> 
     return _TEMPLATE_FIELD_RE.sub(replace, template)
 
 
-def parse_thresholds(spec: Optional[str]) -> Optional[list[tuple[float, str]]]:
+def parse_thresholds(spec: str | None) -> list[tuple[float, str]] | None:
     """Parse ``min:color`` threshold specs such as ``90:green,0:red``."""
     if not spec:
         return None
@@ -242,8 +242,8 @@ def parse_thresholds(spec: Optional[str]) -> Optional[list[tuple[float, str]]]:
 
 
 def color_for_value(
-    value: Any, thresholds: Optional[list[tuple[float, str]]]
-) -> Optional[str]:
+    value: Any, thresholds: list[tuple[float, str]] | None
+) -> str | None:
     """Return the threshold color for a selected numeric value."""
     if thresholds is None:
         return None
@@ -256,13 +256,13 @@ def color_for_value(
 
 
 def badge_from_structured_data(
-    source: Union[str, "os.PathLike[str]"],
-    label: Optional[str] = None,
-    query: Optional[str] = None,
+    source: str | os.PathLike[str],
+    label: str | None = None,
+    query: str | None = None,
     color: str = "blue",
-    template: Optional[str] = None,
-    thresholds: Optional[Union[str, list[tuple[float, str]]]] = None,
-    input_format: Optional[str] = None,
+    template: str | None = None,
+    thresholds: str | list[tuple[float, str]] | None = None,
+    input_format: str | None = None,
 ) -> str:
     """Generate a badge from a JSON or TOML file."""
     data = load_structured_data(source, input_format=input_format)
@@ -284,7 +284,7 @@ def badge_from_structured_data(
 
 
 def package_from_lock(
-    source: Union[str, "os.PathLike[str]"],
+    source: str | os.PathLike[str],
     package_name: str,
 ) -> dict[str, Any]:
     """Find a package entry in a uv.lock or poetry.lock TOML file."""
@@ -304,11 +304,11 @@ def package_from_lock(
 
 
 def badge_from_lock(
-    source: Union[str, "os.PathLike[str]"],
+    source: str | os.PathLike[str],
     package_name: str,
-    label: Optional[str] = None,
+    label: str | None = None,
     color: str = "blue",
-    template: Optional[str] = None,
+    template: str | None = None,
 ) -> str:
     """Generate a package version badge from a uv.lock or poetry.lock file."""
     package = package_from_lock(source, package_name)

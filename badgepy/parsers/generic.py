@@ -31,12 +31,11 @@ JSON::
 
 import json
 import os
-from typing import Union
 
 from badgepy.presets import custom_badge
 
 
-def parse_generic(source: Union[str, "os.PathLike[str]"]) -> dict[str, str]:
+def parse_generic(source: str | os.PathLike[str]) -> dict[str, str]:
     """Parse a generic key-value or JSON file.
 
     Args:
@@ -67,7 +66,7 @@ def parse_generic(source: Union[str, "os.PathLike[str]"]) -> dict[str, str]:
 
 
 def badges_from_generic(
-    source: Union[str, "os.PathLike[str]"],
+    source: str | os.PathLike[str],
     color: str = "blue",
 ) -> dict[str, str]:
     """Parse a generic file and generate a badge for each key-value pair.
