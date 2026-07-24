@@ -23,6 +23,8 @@ never hits a shared rate limit at display time.
 '<svg...</svg>'
 """
 
+from urllib.parse import quote
+
 import requests
 
 from badgepy.presets import custom_badge
@@ -91,7 +93,7 @@ def fetch_recent_downloads(
     Returns:
         A dict with ``last_day``, ``last_week`` and ``last_month`` keys.
     """
-    url = PYPISTATS_RECENT_URL.format(package=requests.utils.quote(package))
+    url = PYPISTATS_RECENT_URL.format(package=quote(package, safe=""))
     getter = session.get if session is not None else requests.get
     response = getter(url, timeout=timeout)
     response.raise_for_status()
