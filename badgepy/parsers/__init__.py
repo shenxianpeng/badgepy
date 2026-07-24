@@ -23,6 +23,12 @@ from badgepy.parsers.structured import (
     package_from_lock,
     select_value,
 )
+from badgepy.parsers.pypi import (
+    badge_from_pypi,
+    download_count,
+    fetch_recent_downloads,
+    humanize_count,
+)
 
 __all__ = [
     "parse_junit",
@@ -36,4 +42,8 @@ __all__ = [
     "load_structured_data",
     "package_from_lock",
     "select_value",
+    "badge_from_pypi",
+    "download_count",
+    "fetch_recent_downloads",
+    "humanize_count",
 ]

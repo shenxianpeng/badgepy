@@ -387,5 +387,77 @@ class TestOutput(unittest.TestCase):
                 self.assertTrue(os.path.exists(p))
 
 
+class TestPyPIParser(unittest.TestCase):
+    def _fake_get(self, data):
+        from unittest import mock
+
+        response = mock.Mock()
+        response.raise_for_status = mock.Mock()
+        response.json = mock.Mock(return_value={"data": data, "package": "pkg"})
+        return mock.Mock(return_value=response)
+
+    def test_humanize_count(self):
+        from badgepy.parsers.pypi import humanize_count
+
+        self.assertEqual(humanize_count(0), "0")
+        self.assertEqual(humanize_count(999), "999")
+        self.assertEqual(humanize_count(1234), "1.2k")
+        self.assertEqual(humanize_count(12345), "12k")
+        self.assertEqual(humanize_count(123456), "123k")
+        self.assertEqual(humanize_count(1234567), "1.2M")
+        self.assertEqual(humanize_count(999999), "1M")
+
+    def test_fetch_recent_downloads(self):
+        from unittest import mock
+        from badgepy.parsers import pypi
+
+        fake = self._fake_get({"last_day": 100, "last_week": 700, "last_month": 3000})
+        with mock.patch.object(pypi.requests, "get", fake):
+            data = pypi.fetch_recent_downloads("python-multipart")
+        self.assertEqual(data["last_month"], 3000)
+        called_url = fake.call_args[0][0]
+        self.assertIn("python-multipart", called_url)
+
+    def test_download_count_metric(self):
+        from unittest import mock
+        from badgepy.parsers import pypi
+
+        fake = self._fake_get({"last_day": 100, "last_week": 700, "last_month": 3000})
+        with mock.patch.object(pypi.requests, "get", fake):
+            self.assertEqual(pypi.download_count("pkg", "dm"), 3000)
+            self.assertEqual(pypi.download_count("pkg", "dw"), 700)
+            self.assertEqual(pypi.download_count("pkg", "dd"), 100)
+
+    def test_download_count_bad_metric(self):
+        from badgepy.parsers import pypi
+
+        with self.assertRaises(ValueError):
+            pypi.download_count("pkg", "bogus")
+
+    def test_badge_from_pypi(self):
+        from unittest import mock
+        from badgepy.parsers import pypi
+
+        fake = self._fake_get(
+            {"last_day": 100, "last_week": 700, "last_month": 1234567}
+        )
+        with mock.patch.object(pypi.requests, "get", fake):
+            svg = pypi.badge_from_pypi("python-multipart", metric="dm")
+        self.assertIn("downloads", svg)
+        self.assertIn("1.2M/month", svg)
+
+    def test_badge_from_pypi_template(self):
+        from unittest import mock
+        from badgepy.parsers import pypi
+
+        fake = self._fake_get({"last_day": 100, "last_week": 700, "last_month": 3000})
+        with mock.patch.object(pypi.requests, "get", fake):
+            svg = pypi.badge_from_pypi(
+                "pkg", metric="dm", label="pypi", template="{value} ({count})"
+            )
+        self.assertIn("pypi", svg)
+        self.assertIn("3k (3000)", svg)
+
+
 if __name__ == "__main__":
     unittest.main()
