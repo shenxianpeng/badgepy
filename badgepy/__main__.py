@@ -233,6 +233,29 @@ def _cmd_from_structured(args: argparse.Namespace, input_format: str) -> None:
     _output_badge(svg, args)
 
 
+def _cmd_from_pypi(args: argparse.Namespace) -> None:
+    """Generate a PyPI download-count badge from pypistats.org."""
+    from badgepy.parsers.pypi import badge_from_pypi
+
+    try:
+        svg = badge_from_pypi(
+            args.package,
+            metric=args.metric,
+            label=args.label,
+            color=args.color or "blue",
+            template=args.template,
+            timeout=args.timeout,
+        )
+    except Exception as exc:
+        if args.on_error == "raise":
+            print(f"failed to generate badge: {exc}", file=sys.stderr)
+            sys.exit(1)
+        args.query = args.label or "downloads"
+        svg = _fallback_badge(args)
+
+    _output_badge(svg, args)
+
+
 def _cmd_from_lock(args: argparse.Namespace) -> None:
     """Generate a package badge from a uv.lock or poetry.lock file."""
     from badgepy.parsers.structured import badge_from_lock
@@ -669,6 +692,65 @@ def main():
     )
     _add_output_args(lock_parser)
 
+    # ── from-pypi subcommand ──
+    pypi_parser = subparsers.add_parser(
+        "from-pypi",
+        help="generate a PyPI download-count badge from pypistats.org",
+        description=(
+            "Fetch download counts from pypistats.org and render a static "
+            "badge. Run this in CI to avoid shields.io's shared upstream "
+            "rate limits at display time."
+        ),
+    )
+    pypi_parser.add_argument(
+        "package",
+        help="the PyPI project name, e.g. python-multipart",
+    )
+    pypi_parser.add_argument(
+        "--metric",
+        choices=["dd", "dw", "dm"],
+        default="dm",
+        help="downloads per day (dd), week (dw), or month (dm); default: dm",
+    )
+    pypi_parser.add_argument(
+        "--label",
+        default=None,
+        help="left-hand badge label (default: downloads)",
+    )
+    pypi_parser.add_argument(
+        "--template",
+        default=None,
+        help="right-hand template using {value}, {count}, or {period}",
+    )
+    pypi_parser.add_argument(
+        "--color",
+        default=None,
+        help="badge color (default: blue)",
+    )
+    pypi_parser.add_argument(
+        "--timeout",
+        type=float,
+        default=10.0,
+        help="HTTP request timeout in seconds (default: 10)",
+    )
+    pypi_parser.add_argument(
+        "--on-error",
+        choices=["raise", "badge", "hide"],
+        default="raise",
+        help="how to handle fetch or parse errors",
+    )
+    pypi_parser.add_argument(
+        "--error-message",
+        default="unknown",
+        help="fallback badge message for --on-error=badge",
+    )
+    pypi_parser.add_argument(
+        "--error-color",
+        default="lightgrey",
+        help="fallback badge color for --on-error=badge",
+    )
+    _add_output_args(pypi_parser)
+
     args = parser.parse_args()
 
     if args.command is None:
@@ -690,6 +772,8 @@ def main():
         _cmd_from_structured(args, "toml")
     elif args.command == "from-lock":
         _cmd_from_lock(args)
+    elif args.command == "from-pypi":
+        _cmd_from_pypi(args)
 
 
 if __name__ == "__main__":

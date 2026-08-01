@@ -206,6 +206,10 @@ Generate badges directly from test and coverage report files — no external API
 | `badgepy from-coverage tests/coverage.xml --output-dir badges/` | ![coverage](badges/coverage.svg) ![branch-coverage](badges/branch-coverage.svg) |
 
 ```sh
+# PyPI download counts, fetched from pypistats.org (avoids shields.io's
+# shared upstream rate limit — run this in CI and commit the SVG)
+badgepy from-pypi python-multipart --metric dm -o badges/downloads.svg
+
 # From generic key-value or JSON files
 badgepy from-generic metrics.json --output-dir badges/
 
@@ -233,6 +237,42 @@ svg = badge_from_structured_data('pyproject.toml', query='project.version', labe
 ```
 
 See the [CI Integration Guide](docs/ci-integration.md) for GitHub Actions, GitLab CI, and Jenkins examples.
+
+### PyPI Download Badges
+
+Tired of `https://img.shields.io/pypi/dm/<package>` showing **"rate limited by
+upstream service"**? That error comes from shields.io sharing a single upstream
+quota across every README on the internet — it has nothing to do with your
+project. badgepy fetches the count from [pypistats.org](https://pypistats.org)
+directly, so you control retries and caching, then renders a static SVG that
+never hits a shared rate limit at display time:
+
+```sh
+# Downloads per month (dm), week (dw), or day (dd)
+badgepy from-pypi python-multipart --metric dm -o badges/downloads.svg
+
+# Custom label, color, and message template
+badgepy from-pypi python-multipart \
+    --metric dm \
+    --label "pypi downloads" \
+    --color blue \
+    --template "{value}/month" \
+    -o badges/downloads.svg
+```
+
+Run it on a schedule in CI, commit the generated SVG, and reference the committed
+file in your README — no runtime call to shields.io, so the badge always renders.
+Use `--on-error hide` (empty badge) or `--on-error badge` (neutral fallback) to
+keep builds green if pypistats.org is briefly unavailable.
+
+From Python:
+
+```python
+from badgepy.parsers.pypi import badge_from_pypi, download_count
+
+svg = badge_from_pypi('python-multipart', metric='dm')  # '<svg...>'
+n = download_count('python-multipart', 'dm')            # raw integer
+```
 
 ### Output to File
 

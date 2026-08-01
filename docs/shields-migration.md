@@ -80,6 +80,34 @@ badgepy from-json coverage-summary.json \
 badgepy from-json optional-metrics.json --query downloads --on-error hide -o badges/downloads.svg
 ```
 
+## Replacing `pypi/dm` download badges
+
+`https://img.shields.io/pypi/dm/<package>` frequently renders as
+**"rate limited by upstream service"** because shields.io shares one upstream
+quota across every README that uses it. badgepy queries
+[pypistats.org](https://pypistats.org) directly from your own CI, so you are not
+sharing that quota, and renders a static SVG:
+
+```diff
+- ![downloads](https://img.shields.io/pypi/dm/python-multipart)
++ ![downloads](badges/downloads.svg)
+```
+
+Generate and commit the SVG on a schedule:
+
+```bash
+badgepy from-pypi python-multipart --metric dm -o badges/downloads.svg
+```
+
+| shields.io URL | badgepy CLI command |
+|---|---|
+| `https://img.shields.io/pypi/dm/<pkg>` | `badgepy from-pypi <pkg> --metric dm` |
+| `https://img.shields.io/pypi/dw/<pkg>` | `badgepy from-pypi <pkg> --metric dw` |
+| `https://img.shields.io/pypi/dd/<pkg>` | `badgepy from-pypi <pkg> --metric dd` |
+
+Add `--on-error hide` or `--on-error badge` so a transient pypistats.org outage
+never breaks your build.
+
 ## Preset badges reference
 
 | Preset | Usage | Auto-coloring |
