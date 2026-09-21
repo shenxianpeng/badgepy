@@ -118,7 +118,7 @@ The `--logo` option accepts a URL:
 ```sh
 badgepy \
     --left-text="python" \
-    --right-text="3.9, 3.10, 3.11, 3.12, 3.13, 3.14" \
+    --right-text="3.10, 3.11, 3.12, 3.13, 3.14" \
     --whole-link="https://www.python.org/" \
     --browser \
     --logo='https://dev.w3.org/SVG/tools/svgweb/samples/svg-files/python.svg'
