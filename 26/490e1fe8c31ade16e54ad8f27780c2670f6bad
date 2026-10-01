@@ -1,0 +1,27 @@
+tests/test_precalculated_text_measurer.py
+  s_66212c309e21f0::t_acf2d74aaeafec 70-77
+  s_66212c309e21f0::t_1c3911b14cddcf 17-18,22
+  s_66212c309e21f0::t_1989db45392eb9 23
+tests/test_cli.py
+  s_66212c309e21f0::t_97b99f65c1af22 16,23-53
+badgepy/__main__.py
+  s_66212c309e21f0::t_1052bd3c893398 21,37-38
+badgepy/precalculated_text_measurer.py
+  s_66212c309e21f0::t_98acc0cd3d999d 81-85,91-92
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "26490e1fe8c31ade16e54ad8f27780c2670f6bad",
+  "prompts": {},
+  "sessions": {
+    "s_66212c309e21f0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8763d161-5362-48a1-ae9b-11f7bcd83469",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Xianpeng Shen <xianpeng.shen@gmail.com>"
+    }
+  }
+}
