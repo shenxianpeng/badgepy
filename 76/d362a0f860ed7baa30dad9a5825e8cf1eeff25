@@ -1,0 +1,29 @@
+.github/workflows/ci.yml
+  s_66212c309e21f0::t_818f657c5c1cff 80
+README.md
+  s_66212c309e21f0::t_4702f6e4b07312 121
+pyproject.toml
+  s_66212c309e21f0::t_8270b2c8a77653 9
+tests/golden-images/python.svg
+  s_66212c309e21f0::t_d538a9e46f70df 1
+tests/test-badges.json
+  s_66212c309e21f0::t_b8d5a2baf7a6ca 82
+badgepy/precalculated_text_measurer.py
+  s_66212c309e21f0::t_5634e4709e6dff 93-95
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "76d362a0f860ed7baa30dad9a5825e8cf1eeff25",
+  "prompts": {},
+  "sessions": {
+    "s_66212c309e21f0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8763d161-5362-48a1-ae9b-11f7bcd83469",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Xianpeng Shen <xianpeng.shen@gmail.com>"
+    }
+  }
+}
