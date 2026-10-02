@@ -15,14 +15,24 @@
 
 import json
 import os
+import sys
 import tempfile
 import unittest
+from unittest import mock
+from xml.dom import minidom
 
 from badgepy.parsers.junit import parse_junit, badges_from_junit
-from badgepy.parsers.coverage import parse_coverage, badges_from_coverage
+from badgepy.parsers.coverage import (
+    CoverageResult,
+    parse_coverage,
+    badges_from_coverage,
+)
 from badgepy.parsers.generic import parse_generic, badges_from_generic
 from badgepy.parsers.structured import (
     _parse_basic_toml,
+    _parse_toml_value,
+    _split_toml_array,
+    _strip_toml_comment,
     badge_from_lock,
     badge_from_structured_data,
     color_for_value,
@@ -31,6 +41,7 @@ from badgepy.parsers.structured import (
     parse_thresholds,
     render_template,
     select_value,
+    stringify_value,
 )
 
 
@@ -108,6 +119,27 @@ class TestJUnitParser(unittest.TestCase):
         finally:
             os.unlink(path)
 
+    def test_missing_counts_default_to_zero(self):
+        path = self._write_temp('<testsuites><testsuite tests="4"/></testsuites>')
+        try:
+            result = parse_junit(path)
+            self.assertEqual(
+                (result.tests, result.failures, result.errors, result.skipped),
+                (4, 0, 0, 0),
+            )
+            self.assertEqual(result.passed, 4)
+        finally:
+            os.unlink(path)
+
+    def test_errors_count_as_failed_in_badge(self):
+        path = self._write_temp('<testsuite tests="5" failures="1" errors="2"/>')
+        try:
+            svg = badges_from_junit(path)["tests"]
+            self.assertIn(">2 passed, 3 failed<", svg)
+            self.assertIn('fill="#e05d44"', svg)
+        finally:
+            os.unlink(path)
+
 
 class TestCoverageParser(unittest.TestCase):
     def _write_temp(self, content: str) -> str:
@@ -167,6 +199,32 @@ class TestCoverageParser(unittest.TestCase):
         finally:
             os.unlink(path)
 
+    def test_badges_without_branch_rate(self):
+        path = self._write_temp('<coverage line-rate="0.42"/>')
+        try:
+            badges = badges_from_coverage(path)
+            self.assertEqual(list(badges), ["coverage"])
+            self.assertIn(">42%<", badges["coverage"])
+        finally:
+            os.unlink(path)
+
+    def test_missing_line_rate_defaults_to_zero(self):
+        path = self._write_temp('<coverage branch-rate=""/>')
+        try:
+            result = parse_coverage(path)
+            self.assertEqual(result.line_rate, 0.0)
+            self.assertIsNone(result.branch_rate)
+        finally:
+            os.unlink(path)
+
+    def test_percentages(self):
+        self.assertIsNone(
+            CoverageResult(line_rate=0.5, branch_rate=None).branch_percentage
+        )
+        result = CoverageResult(line_rate=0.25, branch_rate=0.125)
+        self.assertEqual(result.line_percentage, 25.0)
+        self.assertEqual(result.branch_percentage, 12.5)
+
 
 class TestGenericParser(unittest.TestCase):
     def _write_temp(self, content: str, suffix: str = ".txt") -> str:
@@ -212,6 +270,32 @@ class TestGenericParser(unittest.TestCase):
             self.assertIn("lint", badges)
             self.assertIn("warnings", badges)
             self.assertIn("<svg", badges["lint"])
+        finally:
+            os.unlink(path)
+
+    def test_key_value_lines_without_separator_are_ignored(self):
+        path = self._write_temp("  key = spaced value  \nno separator here\nempty=\n")
+        try:
+            self.assertEqual(parse_generic(path), {"key": "spaced value", "empty": ""})
+        finally:
+            os.unlink(path)
+
+    def test_json_values_are_stringified(self):
+        data = {"score": 8.5, "ok": True, "items": [1, 2], "none": None}
+        path = self._write_temp(json.dumps(data), suffix=".json")
+        try:
+            self.assertEqual(
+                parse_generic(path),
+                {"score": "8.5", "ok": "True", "items": "[1, 2]", "none": "None"},
+            )
+        finally:
+            os.unlink(path)
+
+    def test_badges_from_generic_color(self):
+        path = self._write_temp("lint=clean")
+        try:
+            badges = badges_from_generic(path, color="red")
+            self.assertIn('fill="#e05d44"', badges["lint"])
         finally:
             os.unlink(path)
 
@@ -364,6 +448,223 @@ class TestStructuredParser(unittest.TestCase):
         finally:
             os.unlink(path)
 
+    def test_lock_skips_entries_that_are_not_tables(self):
+        data = {"package": ["oops", {"name": "Ruff", "version": "0.1.0"}]}
+        with mock.patch(
+            "badgepy.parsers.structured.load_structured_data", return_value=data
+        ) as load:
+            self.assertEqual(package_from_lock("uv.lock", "ruff")["version"], "0.1.0")
+        load.assert_called_once_with("uv.lock", input_format="toml")
+
+    def test_badge_from_lock_requires_version(self):
+        path = self._write_temp('[[package]]\nname = "ruff"\n', ".lock")
+        try:
+            with self.assertRaisesRegex(KeyError, "has no version"):
+                badge_from_lock(path, "ruff")
+        finally:
+            os.unlink(path)
+
+    def test_badge_from_lock_label_and_template(self):
+        path = self._write_temp(
+            '[[package]]\nname = "ruff"\nversion = "0.14.6"\n', ".lock"
+        )
+        try:
+            svg = badge_from_lock(
+                path, "ruff", label="linter", template="{name}=={value}", color="red"
+            )
+            self.assertIn(">linter<", svg)
+            self.assertIn(">ruff==0.14.6<", svg)
+            self.assertIn('fill="#e05d44"', svg)
+        finally:
+            os.unlink(path)
+
+    def test_toml_without_tomllib_uses_fallback_parser(self):
+        content = '[project]\nname = "badgepy"\nversion = "1.2.3"\n'
+        path = self._write_temp(content, ".toml")
+        try:
+            # A None entry in sys.modules makes `import tomllib` fail.
+            with mock.patch.dict(sys.modules, {"tomllib": None}):
+                result = load_structured_data(path)
+            self.assertEqual(
+                result, {"project": {"name": "badgepy", "version": "1.2.3"}}
+            )
+        finally:
+            os.unlink(path)
+
+    def test_explicit_input_format(self):
+        path = self._write_temp('{"a": 1}', ".txt")
+        try:
+            self.assertEqual(load_structured_data(path, input_format="JSON"), {"a": 1})
+            with self.assertRaisesRegex(ValueError, "unsupported .* format: txt"):
+                load_structured_data(path)
+        finally:
+            os.unlink(path)
+
+
+class TestBasicTomlParser(unittest.TestCase):
+    """Tests for the TOML subset parser used when tomllib is unavailable."""
+
+    def test_strip_comment(self):
+        self.assertEqual(_strip_toml_comment("a = 1 # note"), "a = 1")
+        self.assertEqual(_strip_toml_comment('a = "x # y" # z'), 'a = "x # y"')
+        self.assertEqual(_strip_toml_comment("a = 'x # y' # z"), "a = 'x # y'")
+        self.assertEqual(
+            _strip_toml_comment('a = "say \\"hi\\" # still" # z'),
+            'a = "say \\"hi\\" # still"',
+        )
+        self.assertEqual(_strip_toml_comment("  # only a comment"), "")
+        self.assertEqual(_strip_toml_comment("  a = 1  "), "a = 1")
+
+    def test_split_array(self):
+        self.assertEqual(
+            _split_toml_array('"a, b", \'c,d\', "e\\",f", 1,'),
+            ['"a, b"', "'c,d'", '"e\\",f"', "1"],
+        )
+        self.assertEqual(_split_toml_array(""), [])
+
+    def test_parse_values(self):
+        cases = {
+            '"double \\u00e9"': "double é",
+            "'single'": "single",
+            "true": True,
+            "false": False,
+            "[]": [],
+            '[1, 2.5, "x", [true]]': [1, 2.5, "x", [True]],
+            "42": 42,
+            "-7": -7,
+            "1e3": 1000.0,
+            "1.2.3": "1.2.3",
+            "bare": "bare",
+        }
+        for raw, expected in cases.items():
+            with self.subTest(raw=raw):
+                value = _parse_toml_value(raw)
+                self.assertEqual(value, expected)
+                self.assertIs(type(value), type(expected))
+
+    def test_parse_tables(self):
+        result = _parse_basic_toml(
+            """
+            top = 1
+            not a key value line
+            [tool]
+            name = "x"  # comment
+            [tool.badge]
+            status = 'ok'
+            [[tool.items]]
+            id = 1
+            [[tool.items]]
+            id = 2
+            [other]
+            """
+        )
+        self.assertEqual(
+            result,
+            {
+                "top": 1,
+                "tool": {
+                    "name": "x",
+                    "badge": {"status": "ok"},
+                    "items": [{"id": 1}, {"id": 2}],
+                },
+                "other": {},
+            },
+        )
+
+
+class TestStructuredQueries(unittest.TestCase):
+    DATA = {
+        "project": {"name": "badgepy", "version": "1.2.3"},
+        "items": [{"name": "first"}, {"name": "second", "tags": ["a", "b"]}],
+        "matrix": [[1, 2], [3, 4]],
+    }
+
+    def test_select_value_without_query(self):
+        self.assertIs(select_value(self.DATA, None), self.DATA)
+        self.assertIs(select_value(self.DATA, ""), self.DATA)
+
+    def test_select_value_paths(self):
+        self.assertEqual(select_value(self.DATA, "items[1].tags[0]"), "a")
+        self.assertEqual(select_value(self.DATA, "matrix[1][0]"), 3)
+
+    def test_select_value_errors(self):
+        with self.assertRaisesRegex(KeyError, "invalid path component"):
+            select_value(self.DATA, "project..name")
+        with self.assertRaisesRegex(KeyError, "path component not found: name"):
+            select_value(self.DATA, "items.name")
+        with self.assertRaises(IndexError):
+            select_value(self.DATA, "items[5]")
+
+    def test_stringify_value(self):
+        self.assertEqual(stringify_value(True), "true")
+        self.assertEqual(stringify_value(False), "false")
+        self.assertEqual(stringify_value({"b": 1, "a": "é"}), '{"a": "é", "b": 1}')
+        self.assertEqual(stringify_value([1, "x"]), '[1, "x"]')
+        self.assertEqual(stringify_value(1.5), "1.5")
+        self.assertEqual(stringify_value(None), "None")
+
+    def test_render_template(self):
+        self.assertEqual(render_template(None, self.DATA, True), "true")
+        self.assertEqual(render_template("", self.DATA, 3), "3")
+        self.assertEqual(
+            render_template("{project.name}: {items[0].name} {value}", self.DATA, 7),
+            "badgepy: first 7",
+        )
+        self.assertEqual(
+            render_template("{ not a field }", self.DATA, 1), "{ not a field }"
+        )
+        with self.assertRaises(KeyError):
+            render_template("{missing}", self.DATA, 1)
+
+    def test_thresholds(self):
+        self.assertIsNone(parse_thresholds(None))
+        self.assertIsNone(parse_thresholds(""))
+        thresholds = parse_thresholds(" 10 : yellow ,90:green")
+        self.assertEqual(thresholds, [(90.0, "green"), (10.0, "yellow")])
+        self.assertEqual(color_for_value("95", thresholds), "green")
+        self.assertEqual(color_for_value(10, thresholds), "yellow")
+        # Values below every threshold use the lowest threshold's color.
+        self.assertEqual(color_for_value(5, thresholds), "yellow")
+        with self.assertRaises(ValueError):
+            color_for_value("n/a", thresholds)
+        with self.assertRaises(ValueError):
+            parse_thresholds("high:green")
+
+
+class TestBadgeFromStructuredData(unittest.TestCase):
+    def setUp(self):
+        tmpdir = tempfile.TemporaryDirectory()
+        self.addCleanup(tmpdir.cleanup)
+        self.path = os.path.join(tmpdir.name, "metrics.json")
+        with open(self.path, "w", encoding="utf-8") as f:
+            json.dump({"lint": {"score": 7.5}}, f)
+
+    def test_label_defaults_to_last_query_component(self):
+        svg = badge_from_structured_data(self.path, query="lint.score")
+        self.assertIn(">score<", svg)
+        self.assertIn(">7.5<", svg)
+        self.assertIn('fill="#007ec6"', svg)
+
+    def test_label_defaults_to_file_name(self):
+        svg = badge_from_structured_data(self.path)
+        texts = [
+            text.firstChild.data
+            for text in minidom.parseString(svg).getElementsByTagName("text")
+        ]
+        self.assertEqual(texts[0], "metrics")
+        self.assertEqual(texts[-1], '{"lint": {"score": 7.5}}')
+
+    def test_threshold_list_and_color(self):
+        svg = badge_from_structured_data(
+            self.path,
+            label="lint",
+            query="lint.score",
+            color="blue",
+            thresholds=[(8.0, "green"), (0.0, "orange")],
+        )
+        self.assertIn(">lint<", svg)
+        self.assertIn('fill="#fe7d37"', svg)
+
 
 class TestOutput(unittest.TestCase):
     def test_write_badge(self):
@@ -385,6 +686,16 @@ class TestOutput(unittest.TestCase):
             self.assertEqual(len(paths), 2)
             for p in paths:
                 self.assertTrue(os.path.exists(p))
+
+    def test_write_badges_allows_names_in_subdirectories(self):
+        from badgepy.output import write_badges
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            (path,) = write_badges({"lint/errors": "<svg/>"}, tmpdir)
+            self.assertEqual(
+                path, os.path.join(os.path.abspath(tmpdir), "lint", "errors.svg")
+            )
+            self.assertTrue(os.path.isfile(path))
 
 
 if __name__ == "__main__":
