@@ -1,0 +1,22 @@
+.github/workflows/ci.yml
+  h_20d8fd5fdd9091 80,86
+README.md
+  h_20d8fd5fdd9091 121
+pyproject.toml
+  h_20d8fd5fdd9091 9,21
+tests/golden-images/python.svg
+  h_20d8fd5fdd9091 1
+tests/test-badges.json
+  h_20d8fd5fdd9091 82
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "f01b61ea954820ab7753623eb860717890483cf1",
+  "prompts": {},
+  "humans": {
+    "h_20d8fd5fdd9091": {
+      "author": "Xianpeng Shen <xianpeng.shen@gmail.com>"
+    }
+  }
+}
