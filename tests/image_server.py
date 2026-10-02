@@ -14,7 +14,7 @@
 """An HTTP image server that can be used to set logo embedding.
 
 The server will respond to any request with the image data provided in the
-constructor.
+constructor, using the given Content-Type (or none if it is None).
 """
 
 from http import server
@@ -22,8 +22,9 @@ import threading
 
 
 class ImageServer:
-    def __init__(self, image_data):
+    def __init__(self, image_data, content_type="image/png"):
         self._image_data = image_data
+        self._content_type = content_type
 
     def start_server(self):
         srv = self
@@ -31,15 +32,16 @@ class ImageServer:
         class Handler(server.BaseHTTPRequestHandler):
             def do_GET(self):
                 self.send_response(200)
-                self.send_header("Content-Type", "image/png")
+                if srv._content_type is not None:
+                    self.send_header("Content-Type", srv._content_type)
                 self.end_headers()
                 self.wfile.write(srv._image_data)
 
         self._httpd = server.HTTPServer(("localhost", 0), Handler)
         self.logo_url = "http://localhost:{0}".format(self._httpd.server_port)
 
-        thread = threading.Thread(target=self._httpd.serve_forever)
-        thread.start()
+        self._thread = threading.Thread(target=self._httpd.serve_forever)
+        self._thread.start()
 
     def fix_embedded_url_reference(self, example):
         if example.get("logo") == "<embedded>":
@@ -47,3 +49,5 @@ class ImageServer:
 
     def stop_server(self):
         self._httpd.shutdown()
+        self._httpd.server_close()
+        self._thread.join()

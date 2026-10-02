@@ -65,3 +65,8 @@ fallback_version = "0.0.0"
 
 [tool.setuptools.package-data]
 badgepy = ["badge-template-full.svg", "default-widths.json", "py.typed"]
+
+[tool.coverage.report]
+exclude_also = [
+    'if __name__ == "__main__":',
+]
