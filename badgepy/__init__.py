@@ -80,13 +80,18 @@ def _remove_blanks(node):
             _remove_blanks(x)
 
 
+# Seconds to wait when fetching a remote image to embed. Without a timeout an
+# unresponsive host can block the caller (e.g. a web server worker) forever.
+_EMBED_IMAGE_TIMEOUT = 10
+
+
 def _embed_image(url: str) -> str:
     parsed_url = urllib.parse.urlparse(url)
 
     if parsed_url.scheme == "data":
         return url
     elif parsed_url.scheme.startswith("http"):
-        r = requests.get(url)
+        r = requests.get(url, timeout=_EMBED_IMAGE_TIMEOUT)
         r.raise_for_status()
         content_type = r.headers.get("content-type")
         if content_type is None:
@@ -185,6 +190,7 @@ def badge(
             external image referenced. When True, `logo` must be a HTTP/HTTPS
             URI or a filesystem path. Also, the `badge` call may raise an
             exception if the logo cannot be loaded, is not an image, etc.
+            HTTP/HTTPS logos are fetched with a 10 second timeout.
         whole_title: The title attribute to associate with the entire badge.
             See https://developer.mozilla.org/en-US/docs/Web/SVG/Element/title.
         left_title: The title attribute to associate with the left part of the

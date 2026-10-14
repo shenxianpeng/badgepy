@@ -13,7 +13,7 @@ authors = [
     { name = "Brian Quinlan", email = "brian@sweetapp.com" },
     { name = "Xianpeng Shen", email = "xianpeng.shen@gmail.com" }
 ]
-keywords = ["github", "gh-badges", "badge", "shield", "status"]
+keywords = ["github", "gh-badges", "badge", "shield", "status", "pybadges"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
