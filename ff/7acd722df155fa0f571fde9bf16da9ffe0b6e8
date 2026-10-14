@@ -1,0 +1,21 @@
+badgepy/output.py
+  s_d0305729b647e7::t_473d72e3ae451c 17-18
+badgepy/parsers/generic.py
+  s_d0305729b647e7::t_213b4bbea8d271 82-85
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "ff7acd722df155fa0f571fde9bf16da9ffe0b6e8",
+  "prompts": {},
+  "sessions": {
+    "s_d0305729b647e7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a5d8ebc3-6dff-49b0-a743-a444ed71fc83",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Xianpeng Shen <xianpeng.shen@gmail.com>"
+    }
+  }
+}
