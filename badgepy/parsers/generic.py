@@ -79,4 +79,7 @@ def badges_from_generic(
         A dict mapping badge names to SVG strings.
     """
     data = parse_generic(source)
-    return {key: custom_badge(label=key, message=value, color=color) for key, value in data.items()}
+    return {
+        key: custom_badge(label=key, message=value, color=color)
+        for key, value in data.items()
+    }

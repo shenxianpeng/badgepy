@@ -14,6 +14,8 @@
 """Utilities for writing badge SVG files to disk."""
 
 import os
+
+
 def write_badge(svg: str, output_path: str) -> str:
     """Write a badge SVG string to a file, creating parent directories as needed.
 
