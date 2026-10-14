@@ -249,6 +249,21 @@ class TestEmbedImage(unittest.TestCase):
             badgepy._embed_image(url), "data:image/png;base64," + PNG_IMAGE_B64
         )
 
+    def test_http_url_uses_timeout(self):
+        url = self._serve(PNG_IMAGE, "image/png")
+        with mock.patch.object(
+            badgepy.requests, "get", wraps=badgepy.requests.get
+        ) as get:
+            badgepy._embed_image(url)
+        get.assert_called_once_with(url, timeout=badgepy._EMBED_IMAGE_TIMEOUT)
+
+    def test_http_url_timeout_propagates(self):
+        with mock.patch.object(
+            badgepy.requests, "get", side_effect=badgepy.requests.Timeout
+        ):
+            with self.assertRaises(badgepy.requests.Timeout):
+                badgepy._embed_image("https://example.com/logo.png")
+
     def test_not_image_url(self):
         with self.assertRaisesRegex(ValueError, 'expected an image, got "text"'):
             badgepy._embed_image("http://www.google.com/")
