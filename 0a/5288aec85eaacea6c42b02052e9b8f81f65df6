@@ -1,0 +1,25 @@
+noxfile.py
+  s_d0305729b647e7::t_0a9b89563a9112 46-51,54-55
+  s_d0305729b647e7::t_04b37700b65a4e 52-53
+  s_d0305729b647e7::t_65184c3bb2d65e 19-21
+pyproject.toml
+  s_d0305729b647e7::t_9997f30cd31ee9 69-77
+CONTRIBUTING.md
+  s_d0305729b647e7::t_22df6c12b91fe2 31
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "0a5288aec85eaacea6c42b02052e9b8f81f65df6",
+  "prompts": {},
+  "sessions": {
+    "s_d0305729b647e7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a5d8ebc3-6dff-49b0-a743-a444ed71fc83",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Xianpeng Shen <xianpeng.shen@gmail.com>"
+    }
+  }
+}
