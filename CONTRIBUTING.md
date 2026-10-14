@@ -28,6 +28,7 @@ Run the nox sessions that CI runs:
 nox -s lint unit type_check
 ```
 
+- `lint` only checks formatting; run `nox -s format` to fix it.
 - Add or update tests for any behavior change.
 - If a change affects rendered badges, regenerate the golden images with
   `python build_golden_images.py` and review the SVG diffs.
