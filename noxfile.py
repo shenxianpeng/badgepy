@@ -16,6 +16,9 @@
 import nox
 import sys
 
+# Pinned so that local runs and CI format and lint the same way.
+RUFF_VERSION = "0.17.0"
+
 
 def _run_tests(session):
     session.run("py.test", "--quiet", "tests", "server-example", *session.posargs)
@@ -40,8 +43,16 @@ def coverage(session):
 
 @nox.session
 def lint(session):
-    """Run the linter."""
-    session.install("ruff")
+    """Check formatting and run the linter without modifying any files."""
+    session.install(f"ruff=={RUFF_VERSION}")
+    session.run("ruff", "format", "--check", ".")
+    session.run("ruff", "check", ".")
+
+
+@nox.session(name="format", default=False)
+def format_code(session):
+    """Reformat the code in place."""
+    session.install(f"ruff=={RUFF_VERSION}")
     session.run("ruff", "format", ".", *session.posargs)
 
 
