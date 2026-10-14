@@ -1,0 +1,19 @@
+.git-blame-ignore-revs
+  s_d0305729b647e7::t_5114241d24bbe4 6-8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "02ecb2e1e7f03be4a932fbae0c6c38ba9ec02fba",
+  "prompts": {},
+  "sessions": {
+    "s_d0305729b647e7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a5d8ebc3-6dff-49b0-a743-a444ed71fc83",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Xianpeng Shen <xianpeng.shen@gmail.com>"
+    }
+  }
+}
