@@ -21,7 +21,7 @@ Both tools produce identical-looking badges, but they work very differently. Her
 | | [Shields.io](https://shields.io) | badgepy |
 |---|---|---|
 | **How it works** | HTTP service — you request a badge URL and get back an SVG | Python library/CLI — generates SVGs locally |
-| **Internet required** | Yes (or [self-host](https://github.com/badges/shields)) | No — works fully offline |
+| **Internet required** | Yes (or [self-host](https://github.com/badges/shields)) | No — rendering is fully offline; only `from-pypi` and remote logos are opt-in network fetches |
 | **Setup** | Zero — just use a URL in your README | `pip install badgepy` |
 | **Customization** | URL query parameters only | Full programmatic control in Python |
 | **CI integration** | Via shields.io endpoint JSON | Native parsers for JUnit, Cobertura, generic JSON |

@@ -30,8 +30,9 @@ import requests
 from badgepy.presets import custom_badge
 
 # pypistats.org exposes recent download totals (last day/week/month) for a
-# single package at this endpoint. It is a different, dedicated upstream from
-# the one shields.io shares across all badge requests.
+# single package at this endpoint. shields.io's pypi/dm badges use the same
+# endpoint, but from shields.io's servers, so all of their requests share one
+# quota; calling it from your own CI uses your own.
 PYPISTATS_RECENT_URL = "https://pypistats.org/api/packages/{package}/recent"
 
 # Metric aliases mirror shields.io: dd=downloads/day, dw=downloads/week,
