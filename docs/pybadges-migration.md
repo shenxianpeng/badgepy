@@ -107,6 +107,9 @@ should be replaced with `importlib.metadata.version("badgepy")` as shown above.
 Beyond the pybadges feature set, badgepy can generate badges from local data without any
 external service:
 
+- The [`flat-square` style](../README.md#styles) via `--style` / `style=`, which pybadges
+  never shipped ([google/pybadges#28](https://github.com/google/pybadges/issues/28)).
+  The default stays `flat`, whose output is unchanged.
 - [Preset badges](../README.md#preset-badges) for build, coverage, version, license and progress
 - [CI report badges](../README.md#ci-report-badges) from JUnit and Cobertura XML files
 - Badges from JSON, TOML, `pyproject.toml` and lock files

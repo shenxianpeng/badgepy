@@ -173,6 +173,27 @@ class TestBadgepyCli(unittest.TestCase):
         self.assertIn('font-family="Open Sans,sans-serif"', result.stdout)
         self.assertIn('width="28.0"', result.stdout)
 
+    def test_style_flat_square(self):
+        result = self._run_badgepy(
+            "--left-text", "build", "--right-text", "passing", "--style", "flat-square"
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertNotIn("clipPath", result.stdout)
+        self.assertNotIn("linearGradient", result.stdout)
+
+    def test_style_defaults_to_flat(self):
+        result = self._run_badgepy("--left-text", "build", "--right-text", "passing")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("clipPath", result.stdout)
+        self.assertIn("linearGradient", result.stdout)
+
+    def test_style_rejects_unknown_value(self):
+        result = self._run_badgepy(
+            "--left-text", "build", "--right-text", "passing", "--style", "plastic"
+        )
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("flat-square", result.stderr)
+
 
 JUNIT_XML = """<?xml version="1.0"?>
 <testsuite tests="10" failures="2" errors="0" skipped="1"/>"""
@@ -343,6 +364,7 @@ class TestCliMain(unittest.TestCase):
             embed_center_image=False,
             logo_width=20.0,
             font_family="serif",
+            style="flat",
         )
 
     # preset

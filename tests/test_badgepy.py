@@ -525,5 +525,77 @@ class TestTitles(unittest.TestCase):
         self.assertNotIn("rgba(0,0,0,0)", svg)
 
 
+class TestStyles(unittest.TestCase):
+    """The flat style rounds the corners and lays a gradient over the badge;
+    flat-square does neither."""
+
+    def test_flat_is_the_default(self):
+        self.assertEqual(
+            badgepy.badge(left_text="label", right_text="ok"),
+            badgepy.badge(left_text="label", right_text="ok", style="flat"),
+        )
+
+    def test_flat_rounds_and_shades(self):
+        svg = badgepy.badge(left_text="label", right_text="ok", style="flat")
+        doc = minidom.parseString(svg)
+        self.assertEqual(len(doc.getElementsByTagName("clipPath")), 1)
+        self.assertEqual(len(doc.getElementsByTagName("linearGradient")), 1)
+        self.assertIn('rx="3"', svg)
+        self.assertIn('fill="url(#smooth)"', svg)
+
+    def test_flat_square_drops_the_clip_path_and_gradient(self):
+        svg = badgepy.badge(left_text="label", right_text="ok", style="flat-square")
+        doc = minidom.parseString(svg)
+        self.assertEqual(doc.getElementsByTagName("clipPath"), [])
+        self.assertEqual(doc.getElementsByTagName("linearGradient"), [])
+        self.assertNotIn("rx=", svg)
+        self.assertNotIn("url(#smooth", svg)
+        for group in doc.getElementsByTagName("g"):
+            self.assertEqual(group.getAttribute("clip-path"), "")
+
+    def test_flat_square_keeps_geometry_text_and_colors(self):
+        """Only the corners and the gradient differ between the two styles."""
+        kwargs = dict(left_text="label", right_text="ok", right_color="brightgreen")
+        flat = minidom.parseString(badgepy.badge(style="flat", **kwargs))
+        square = minidom.parseString(badgepy.badge(style="flat-square", **kwargs))
+
+        def rects(doc):
+            # Skip the clip path's own rect and the gradient overlay, which
+            # are exactly the parts "flat-square" is meant to drop.
+            return [
+                (r.getAttribute("x"), r.getAttribute("width"), r.getAttribute("fill"))
+                for r in doc.getElementsByTagName("rect")
+                if r.parentNode.tagName != "clipPath"
+                and not r.getAttribute("fill").startswith("url(")
+            ]
+
+        def texts(doc):
+            return [t.firstChild.data for t in doc.getElementsByTagName("text")]
+
+        self.assertEqual(rects(flat), rects(square))
+        self.assertEqual(texts(flat), texts(square))
+        self.assertEqual(
+            flat.documentElement.getAttribute("width"),
+            square.documentElement.getAttribute("width"),
+        )
+
+    def test_flat_square_keeps_titles_and_links(self):
+        svg = badgepy.badge(
+            left_text="label",
+            right_text="ok",
+            left_title="Left",
+            left_link="https://left.example/",
+            style="flat-square",
+        )
+        self.assertIn("<title>Left</title>", svg)
+        self.assertIn('xlink:href="https://left.example/"', svg)
+
+    def test_unknown_style(self):
+        with self.assertRaises(ValueError) as cm:
+            badgepy.badge(left_text="label", right_text="ok", style="plastic")
+        self.assertIn("plastic", str(cm.exception))
+        self.assertIn("flat-square", str(cm.exception))
+
+
 if __name__ == "__main__":
     unittest.main()
