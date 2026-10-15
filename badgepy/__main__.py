@@ -103,6 +103,7 @@ def _cmd_badge(args: argparse.Namespace) -> None:
         embed_center_image=args.embed_center_image,
         logo_width=args.logo_width,
         font_family=args.font_family,
+        style=args.style,
     )
     _output_badge(badge, args)
 
@@ -316,6 +317,12 @@ def main():
         "--font-family",
         default="DejaVu Sans,Verdana,Geneva,sans-serif",
         help="the SVG font-family value for badge text",
+    )
+    parser.add_argument(
+        "--style",
+        choices=list(badgepy.STYLES),
+        default="flat",
+        help="the visual style of the badge",
     )
     parser.add_argument(
         "--left-color",

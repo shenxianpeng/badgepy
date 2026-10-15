@@ -6,10 +6,14 @@
 {% set right_width = center_width + right_text_width + 10 if right_text else 0 %}
 {% set id_smooth = 'smooth' + id_suffix %}
 {% set id_round = 'round' + id_suffix %}
+{# "flat" keeps the rounded corners and the gradient overlay; "flat-square"
+   drops both, leaving square corners and solid colors. #}
+{% set flat_square = style == 'flat-square' %}
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="{{ left_width + right_width }}" height="20">
   {% if whole_title %}
     <title>{{ whole_title }}</title>
   {% endif %}
+  {% if not flat_square %}
   <linearGradient id="{{ id_smooth }}" x2="0" y2="100%">
       <stop offset="0" stop-color="#bbb" stop-opacity=".1"/>
     <stop offset="1" stop-opacity=".1"/>
@@ -18,8 +22,9 @@
   <clipPath id="{{ id_round }}">
     <rect width="{{ left_width + right_width }}" height="20" rx="3" fill="#fff"/>
   </clipPath>
+  {% endif %}
 
-  <g clip-path="url(#{{ id_round }})">
+  <g {% if not flat_square %}clip-path="url(#{{ id_round }})"{% endif %}>
     
     <rect width="{{ left_width }}" height="20" fill="{{ left_color }}"/>
 
@@ -29,7 +34,9 @@
 
     <rect x="{{ left_width + center_width }}" width="{{ right_width }}" height="20" fill="{{ right_color }}"/>
 
+    {% if not flat_square %}
     <rect width="{{ left_width + right_width }}" height="20" fill="url(#{{ id_smooth }})"/>
+    {% endif %}
   </g>
 
   <g fill="#fff" text-anchor="middle" font-family="{{ font_family }}" font-size="110">

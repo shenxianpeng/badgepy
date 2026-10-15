@@ -151,6 +151,24 @@ badgepy \
 The `title` element is shown as a [tooltip by browsers](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/title) but is currently [filtered by GitHub](https://github.com/github/markup/issues/1267).
 `--whole-title` applies to the whole badge, while `--left-title`, `--right-title` and `--center-title` are shown when hovering that part.
 
+#### Styles
+
+`--style` selects the look of the badge, matching the shields.io styles of the same name:
+
+| Style | Corners | Gradient |
+| --- | --- | --- |
+| `flat` (default) | rounded | yes |
+| `flat-square` | square | no |
+
+```sh
+badgepy --left-text=build --right-text=passing --right-color=brightgreen --style=flat-square
+```
+
+![style-flat-square](tests/golden-images/style-flat-square.svg)
+
+Everything else — geometry, text, colors, logos, links and titles — is identical between the two.
+`--style` applies to the badge command; preset and CI-report badges are always `flat`.
+
 ### Library
 
 ```python

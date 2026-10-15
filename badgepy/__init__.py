@@ -145,6 +145,12 @@ def _normalize_color(color: str) -> str:
     return _NAME_TO_COLOR.get(color, color)
 
 
+# The badge styles that `badge()` can render, in the sense shields.io uses
+# the term: "flat" has rounded corners and a gradient, "flat-square" has
+# square corners and solid colors.
+STYLES = ("flat", "flat-square")
+
+
 def badge(
     left_text: str,
     right_text: str | None = None,
@@ -169,6 +175,7 @@ def badge(
     id_suffix: str = "",
     logo_width: float = 14,
     font_family: str = "DejaVu Sans,Verdana,Geneva,sans-serif",
+    style: str = "flat",
 ) -> str:
     """Creates a github-style badge as an SVG image.
 
@@ -223,7 +230,20 @@ def badge(
             same page.
         logo_width: Width of the logo image in SVG units. Defaults to 14.
         font_family: SVG font-family value for badge text.
+        style: The visual style of the badge, one of "flat" (the default,
+            rounded corners and a gradient) or "flat-square" (square corners
+            and solid colors). Note that "flat-square" badges carry no
+            gradient or clip path, so `id_suffix` has nothing to disambiguate.
+
+    Raises:
+        ValueError: If `style` is not one of `STYLES`, or if the link, image
+            and color arguments are combined in an unsupported way.
     """
+    if style not in STYLES:
+        raise ValueError(
+            "style must be one of {}, got {!r}".format(", ".join(STYLES), style)
+        )
+
     if measurer is None:
         measurer = precalculated_text_measurer.PrecalculatedTextMeasurer.default()
 
@@ -288,6 +308,7 @@ def badge(
         id_suffix=id_suffix,
         logo_width=logo_width,
         font_family=font_family,
+        style=style,
     )
     xml = minidom.parseString(svg)
     _remove_blanks(xml)
