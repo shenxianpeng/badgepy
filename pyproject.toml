@@ -50,7 +50,7 @@ homepage = "https://github.com/shenxianpeng/badgepy"
 documentation = "https://github.com/shenxianpeng/badgepy#readme"
 source = "https://github.com/shenxianpeng/badgepy"
 tracker = "https://github.com/shenxianpeng/badgepy/issues"
-changelog = "https://github.com/shenxianpeng/badgepy/releases"
+changelog = "https://github.com/shenxianpeng/badgepy/blob/main/CHANGELOG.md"
 funding = "https://github.com/sponsors/shenxianpeng"
 
 [project.scripts]

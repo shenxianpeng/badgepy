@@ -293,6 +293,8 @@ Contributions are welcome! Please read the [contributor guide](CONTRIBUTING.md) 
 ## Versioning
 
 This project follows [SemVer](http://semver.org/).
+See the [changelog](CHANGELOG.md) for what changed in each release, including
+upgrade notes for major versions.
 
 ## License
 
