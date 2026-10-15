@@ -1,0 +1,29 @@
+badgepy/__init__.py
+  s_bbb259206f8eb8::t_9e0a13b7aa7e7e 33
+  s_bbb259206f8eb8::t_1ca4724abc528e 89-103,110-112
+  s_bbb259206f8eb8::t_9a8736f0c67140 211-212
+docs/pybadges-migration.md
+  s_bbb259206f8eb8::t_7fe8852095680e 89-93
+tests/test_badgepy.py
+  s_bbb259206f8eb8::t_b30c775beb2019 234-237
+  s_bbb259206f8eb8::t_231399de39e94d 253,259-289
+  s_bbb259206f8eb8::t_3747272adc59dc 18
+tests/image_server.py
+  s_bbb259206f8eb8::t_9567564bb87493 28-29,36
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "5f31ee1ff323611c137a3e58a7979f7919638d6a",
+  "prompts": {},
+  "sessions": {
+    "s_bbb259206f8eb8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ec3f9dad-662a-4dd8-91fd-2b1f64a0cb62",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Xianpeng Shen <xianpeng.shen@gmail.com>"
+    }
+  }
+}
