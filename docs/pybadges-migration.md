@@ -77,7 +77,9 @@ should be replaced with `importlib.metadata.version("badgepy")` as shown above.
 ## What stays the same
 
 - **Rendered output**: for the same arguments, badgepy produces the same SVG markup as
-  pybadges 3.0.1, so golden-image tests and cached badges keep matching.
+  pybadges 3.0.1, so golden-image tests and cached badges keep matching. The only
+  exceptions are the two fixes listed under [Behavior changes](#behavior-changes):
+  badges with part titles, and badges with a center image but no link.
 - **Text measurement**: the same pre-calculated DejaVu Sans width table is used by default,
   and the Pillow measurer is still available via `--use-pil-text-measurer`.
 
@@ -88,6 +90,12 @@ should be replaced with `importlib.metadata.version("badgepy")` as shown above.
   indefinitely, which could block a web server worker.
 - **Quoted colors**: color values wrapped in quotes, such as `"'#c00'"`, are unquoted
   before use instead of producing an invalid SVG color.
+- **Part titles**: `left_title`, `right_title` and `center_title` are now shown when
+  hovering that part of the badge. pybadges attached them to background shapes that the
+  text and gradient cover, so browsers only ever showed `whole_title`
+  ([google/pybadges#26](https://github.com/google/pybadges/issues/26)).
+- **Center image without a link**: a badge with `center_image` but no `center_link` or
+  `whole_link` no longer contains a link to the relative URL `None`.
 
 ## What you get in addition
 

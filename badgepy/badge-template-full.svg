@@ -21,25 +21,13 @@
 
   <g clip-path="url(#{{ id_round }})">
     
-    <rect width="{{ left_width }}" height="20" fill="{{ left_color }}"> 
-      {% if left_title %}
-        <title>{{ left_title }}</title>
-      {% endif %}
-    </rect>
-    
+    <rect width="{{ left_width }}" height="20" fill="{{ left_color }}"/>
+
     {% if center_image %}
-    <rect x="{{ left_width }}" width="{{ center_width }}" height="20" fill="{{ center_color }}"> 
-      {% if center_title %}
-        <title>{{ center_title }}</title>
-      {% endif %}
-    </rect>
+    <rect x="{{ left_width }}" width="{{ center_width }}" height="20" fill="{{ center_color }}"/>
     {% endif %}
 
-    <rect x="{{ left_width + center_width }}" width="{{ right_width }}" height="20" fill="{{ right_color }}">
-      {% if right_title %}
-        <title>{{ right_title }}</title>
-      {% endif %}
-    </rect>
+    <rect x="{{ left_width + center_width }}" width="{{ right_width }}" height="20" fill="{{ right_color }}"/>
 
     <rect width="{{ left_width + right_width }}" height="20" fill="url(#{{ id_smooth }})"/>
   </g>
@@ -61,19 +49,46 @@
         <text x="{{ (left_width+center_width/2+right_width/2-1)*10 }}" y="140" transform="scale(0.1)" textLength="{{ (right_width-center_width-10)*10 }}" lengthAdjust="spacing">{{ right_text }}</text>
     {% endif %}
 
+  {# Transparent areas drawn last, on top of the text and gradient, so that
+     they receive the pointer: browsers show the <title> of the element under
+     the cursor (or its nearest ancestor), and follow its link. #}
   {% if left_link or whole_link %}
     <a xlink:href="{{ left_link or whole_link }}">
-      <rect width="{{ left_width }}" height="20" fill="rgba(0,0,0,0)"/>
+  {% endif %}
+  {% if left_link or whole_link or left_title %}
+      <rect width="{{ left_width }}" height="20" fill="rgba(0,0,0,0)">
+        {% if left_title %}
+          <title>{{ left_title }}</title>
+        {% endif %}
+      </rect>
+  {% endif %}
+  {% if left_link or whole_link %}
     </a>
   {% endif %}
-  {% if center_image and (center_width or whole_link) %}
+  {% if center_image and (center_link or whole_link) %}
     <a xlink:href="{{ center_link or whole_link }}">
-      <rect x="{{ left_width }}" width="{{ center_width }}" height="20" fill="rgba(0,0,0,0)"/>
+  {% endif %}
+  {% if center_image and (center_link or whole_link or center_title) %}
+      <rect x="{{ left_width }}" width="{{ center_width }}" height="20" fill="rgba(0,0,0,0)">
+        {% if center_title %}
+          <title>{{ center_title }}</title>
+        {% endif %}
+      </rect>
+  {% endif %}
+  {% if center_image and (center_link or whole_link) %}
     </a>
   {% endif %}
   {% if right_link or whole_link %}
     <a xlink:href="{{ right_link or whole_link }}">
-      <rect x="{{ left_width + center_width }}" width="{{ right_width }}" height="20" fill="rgba(0,0,0,0)"/>
+  {% endif %}
+  {% if right_link or whole_link or right_title %}
+      <rect x="{{ left_width + center_width }}" width="{{ right_width }}" height="20" fill="rgba(0,0,0,0)">
+        {% if right_title %}
+          <title>{{ right_title }}</title>
+        {% endif %}
+      </rect>
+  {% endif %}
+  {% if right_link or whole_link %}
     </a>
   {% endif %}
   </g>

@@ -149,6 +149,7 @@ badgepy \
 #### Titles
 
 The `title` element is shown as a [tooltip by browsers](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/title) but is currently [filtered by GitHub](https://github.com/github/markup/issues/1267).
+`--whole-title` applies to the whole badge, while `--left-title`, `--right-title` and `--center-title` are shown when hovering that part.
 
 ### Library
 
