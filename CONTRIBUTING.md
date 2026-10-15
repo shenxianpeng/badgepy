@@ -1,35 +1,46 @@
 # How to Contribute
 
-We'd love to accept your patches and contributions to this project. There are
-just a few small guidelines you need to follow.
+Bug reports, feature requests and pull requests are all welcome. For larger
+changes, please open an issue first so we can agree on the approach before you
+spend time on it.
 
-## Contributor License Agreement
+## Licensing
 
-Contributions to this project must be accompanied by a Contributor License
-Agreement. You (or your employer) retain the copyright to your contribution;
-this simply gives us permission to use and redistribute your contributions as
-part of the project. Head over to <https://cla.developers.google.com/> to see
-your current agreements on file or to sign a new one.
+badgepy is licensed under the [Apache License 2.0](LICENSE). By submitting a
+pull request, you agree that your contribution is licensed under the same
+terms. No separate contributor license agreement is required.
 
-You generally only need to submit a CLA once, so if you've already submitted one
-(even if it was for a different project), you probably don't need to do it
-again.
+## Development setup
+
+```sh
+git clone https://github.com/shenxianpeng/badgepy.git
+cd badgepy
+python -m venv venv
+source venv/bin/activate
+pip install -e .[dev]
+```
+
+## Before submitting a pull request
+
+Run the nox sessions that CI runs:
+
+```sh
+nox -s lint unit type_check
+```
+
+- `lint` only checks formatting; run `nox -s format` to fix it.
+- Add or update tests for any behavior change.
+- If a change affects rendered badges, regenerate the golden images with
+  `python build_golden_images.py` and review the SVG diffs.
+- Use a [Conventional Commits](https://www.conventionalcommits.org) style pull
+  request title (for example `feat: add flat-square style` or
+  `fix: handle empty coverage report`); release notes are generated from them.
 
 ## Code reviews
 
-All submissions, including submissions by project members, require review. We
-use GitHub pull requests for this purpose. Consult
-[GitHub Help](https://help.github.com/articles/about-pull-requests/) for more
-information on using pull requests.
+All submissions, including those from maintainers, are reviewed through GitHub
+pull requests.
 
-Please run the nox tests before sending your code for review. You can do that
-with:
-```sh
-pip install .[dev]
-nox
-```
+## Community guidelines
 
-## Community Guidelines
-
-This project follows [Google's Open Source Community
-Guidelines](https://opensource.google.com/conduct/).
+Please be respectful and constructive in issues, discussions and reviews.

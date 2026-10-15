@@ -13,7 +13,7 @@ authors = [
     { name = "Brian Quinlan", email = "brian@sweetapp.com" },
     { name = "Xianpeng Shen", email = "xianpeng.shen@gmail.com" }
 ]
-keywords = ["github", "gh-badges", "badge", "shield", "status"]
+keywords = ["github", "gh-badges", "badge", "shield", "status", "pybadges"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
@@ -65,3 +65,17 @@ fallback_version = "0.0.0"
 
 [tool.setuptools.package-data]
 badgepy = ["badge-template-full.svg", "default-widths.json", "py.typed"]
+
+[tool.ruff]
+# Keep the hand-written Python examples in Markdown (quoting style, aligned
+# trailing comments) as they are; only format the Python sources.
+extend-exclude = ["*.md"]
+
+[tool.ruff.lint]
+# Pin the rule set so that newer ruff releases don't silently widen it.
+select = ["E4", "E7", "E9", "F"]
+
+[tool.coverage.report]
+exclude_also = [
+    'if __name__ == "__main__":',
+]

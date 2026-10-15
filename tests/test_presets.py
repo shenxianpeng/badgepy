@@ -13,6 +13,7 @@
 # limitations under the License.
 """Tests for badgepy.presets."""
 
+import doctest
 import unittest
 
 from badgepy import presets
@@ -27,7 +28,30 @@ from badgepy.presets import (
 )
 
 
+class TestDocs(unittest.TestCase):
+    def test_docs(self):
+        failed, attempted = doctest.testmod(presets, optionflags=doctest.ELLIPSIS)
+        self.assertGreater(attempted, 0)
+        self.assertEqual(failed, 0)
+
+
 class TestBuildBadge(unittest.TestCase):
+    def test_status_colors(self):
+        cases = {
+            "passing": "#4c1",
+            "PASSING": "#4c1",
+            "failing": "#e05d44",
+            "error": "#e05d44",
+            "pending": "#dfb317",
+            "cancelled": "#9f9f9f",
+            "weird": "#9f9f9f",
+        }
+        for status, color in cases.items():
+            with self.subTest(status=status):
+                svg = build_badge(status)
+                self.assertIn(">%s<" % status, svg)
+                self.assertIn('fill="%s"' % color, svg)
+
     def test_passing(self):
         svg = build_badge("passing")
         self.assertIn("passing", svg)
@@ -62,6 +86,14 @@ class TestCoverageBadge(unittest.TestCase):
     def test_integer_coverage(self):
         svg = coverage_badge(80.0)
         self.assertIn("80%", svg)
+
+    def test_custom_thresholds_and_label(self):
+        thresholds = [(50, "blue"), (10, "orange")]
+        svg = coverage_badge(55, label="lines", thresholds=thresholds)
+        self.assertIn(">lines<", svg)
+        self.assertIn('fill="#007ec6"', svg)
+        # Below every custom threshold falls back to red.
+        self.assertIn('fill="#e05d44"', coverage_badge(5, thresholds=thresholds))
 
 
 class TestProgressBadge(unittest.TestCase):
@@ -98,6 +130,31 @@ class TestProgressBadge(unittest.TestCase):
         with self.assertRaises(ValueError):
             progress_badge(101)
 
+    def test_rejects_negative_percentage(self):
+        with self.assertRaises(ValueError):
+            progress_badge(-1)
+        with self.assertRaises(ValueError):
+            progress_badge(numerator=-1, denominator=4)
+
+    def test_rejects_only_numerator_or_denominator(self):
+        with self.assertRaises(ValueError):
+            progress_badge(numerator=3)
+        with self.assertRaises(ValueError):
+            progress_badge(denominator=3)
+        with self.assertRaises(ValueError):
+            progress_badge(0.5, denominator=3)
+
+    def test_boundaries_and_rounding(self):
+        self.assertIn(">0%<", progress_badge(0))
+        self.assertIn(">100%<", progress_badge(1))
+        self.assertIn(">100%<", progress_badge(100))
+        self.assertIn(">33.3%<", progress_badge(numerator=1, denominator=3))
+
+    def test_custom_label_and_thresholds(self):
+        svg = progress_badge(30, label="docs", thresholds=[(25, "blue")])
+        self.assertIn(">docs<", svg)
+        self.assertIn('fill="#007ec6"', svg)
+
 
 class TestColorForCoverage(unittest.TestCase):
     def test_thresholds(self):
@@ -107,6 +164,18 @@ class TestColorForCoverage(unittest.TestCase):
         self.assertEqual(_color_for_coverage(65), "yellow")
         self.assertEqual(_color_for_coverage(45), "orange")
         self.assertEqual(_color_for_coverage(20), "red")
+
+    def test_threshold_boundaries(self):
+        self.assertEqual(_color_for_coverage(90), "brightgreen")
+        self.assertEqual(_color_for_coverage(89.99), "green")
+        self.assertEqual(_color_for_coverage(0), "red")
+        self.assertEqual(_color_for_coverage(-5), "red")
+
+    def test_custom_thresholds(self):
+        thresholds = [(75, "green"), (50, "yellow")]
+        self.assertEqual(_color_for_coverage(80, thresholds), "green")
+        self.assertEqual(_color_for_coverage(50, thresholds), "yellow")
+        self.assertEqual(_color_for_coverage(49, thresholds), "red")
 
 
 class TestVersionBadge(unittest.TestCase):
@@ -129,6 +198,11 @@ class TestCustomBadge(unittest.TestCase):
         self.assertIn("platform", svg)
         self.assertIn("linux", svg)
 
+    def test_label_color(self):
+        svg = custom_badge("platform", "linux", label_color="#123456")
+        self.assertIn('fill="#123456"', svg)
+        self.assertIn('fill="#007ec6"', svg)
+
 
 class TestTestsBadge(unittest.TestCase):
     def test_all_passing(self):
@@ -144,6 +218,13 @@ class TestTestsBadge(unittest.TestCase):
         svg = presets.tests_badge(7, 0, 3)
         self.assertIn("7 passed", svg)
         self.assertIn("3 skipped", svg)
+
+    def test_colors(self):
+        self.assertIn('fill="#4c1"', presets.tests_badge(10, 0))
+        self.assertIn('fill="#dfb317"', presets.tests_badge(7, 0, 3))
+        svg = presets.tests_badge(5, 1, 2)
+        self.assertIn(">5 passed, 1 failed, 2 skipped<", svg)
+        self.assertIn('fill="#e05d44"', svg)
 
 
 class TestFallbackBadges(unittest.TestCase):
