@@ -25,12 +25,15 @@ class ImageServer:
     def __init__(self, image_data, content_type="image/png"):
         self._image_data = image_data
         self._content_type = content_type
+        # Headers of each request received, in order.
+        self.request_headers = []
 
     def start_server(self):
         srv = self
 
         class Handler(server.BaseHTTPRequestHandler):
             def do_GET(self):
+                srv.request_headers.append(dict(self.headers))
                 self.send_response(200)
                 if srv._content_type is not None:
                     self.send_header("Content-Type", srv._content_type)

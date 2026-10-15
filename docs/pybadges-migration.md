@@ -86,6 +86,11 @@ should be replaced with `importlib.metadata.version("badgepy")` as shown above.
 - **Remote logo timeout**: when `embed_logo=True` (or `--embed-logo`) fetches an HTTP/HTTPS
   logo, badgepy gives up after 10 seconds and raises `requests.Timeout`. pybadges waited
   indefinitely, which could block a web server worker.
+- **Remote logo User-Agent**: logo requests identify themselves as
+  `badgepy/<version> (+https://github.com/shenxianpeng/badgepy) python-requests/<version>`.
+  Hosts such as Wikimedia reject the generic `python-requests` User-Agent that pybadges
+  sent, so embedding a logo from Wikipedia now works
+  ([google/pybadges#40](https://github.com/google/pybadges/issues/40)).
 - **Quoted colors**: color values wrapped in quotes, such as `"'#c00'"`, are unquoted
   before use instead of producing an invalid SVG color.
 
