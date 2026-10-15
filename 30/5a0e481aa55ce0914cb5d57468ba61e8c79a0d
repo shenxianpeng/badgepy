@@ -1,0 +1,20 @@
+pyproject.toml
+  s_bbb259206f8eb8::t_b8e1cd1a9e81d7 49-50,53-54
+  s_bbb259206f8eb8::t_6c0b33c1959dc7 7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "305a0e481aa55ce0914cb5d57468ba61e8c79a0d",
+  "prompts": {},
+  "sessions": {
+    "s_bbb259206f8eb8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ec3f9dad-662a-4dd8-91fd-2b1f64a0cb62",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Xianpeng Shen <xianpeng.shen@gmail.com>"
+    }
+  }
+}
