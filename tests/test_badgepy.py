@@ -407,6 +407,92 @@ class TestLinks(unittest.TestCase):
                     [link, link],
                 )
 
+    def test_center_image_without_link_has_no_anchor(self):
+        svg = badgepy.badge(
+            left_text="label",
+            right_text="ok",
+            center_image="image.png",
+            center_color="red",
+        )
+        self.assertEqual(minidom.parseString(svg).getElementsByTagName("a"), [])
+
+    def test_center_link(self):
+        svg = badgepy.badge(
+            left_text="label",
+            right_text="ok",
+            center_image="image.png",
+            center_color="red",
+            center_link="https://example.com/",
+        )
+        anchors = minidom.parseString(svg).getElementsByTagName("a")
+        self.assertEqual(
+            [anchor.getAttribute("xlink:href") for anchor in anchors],
+            ["https://example.com/"],
+        )
+
+
+class TestTitles(unittest.TestCase):
+    """Browsers show the <title> of the element under the cursor, so part
+    titles must be on elements drawn above the text and gradient."""
+
+    def assertTitleOnTop(self, svg, text):
+        doc = minidom.parseString(svg)
+        elements = doc.getElementsByTagName("*")
+        [title] = [
+            t for t in doc.getElementsByTagName("title") if t.firstChild.data == text
+        ]
+        rect = title.parentNode
+        self.assertEqual(rect.tagName, "rect")
+        self.assertEqual(rect.getAttribute("fill"), "rgba(0,0,0,0)")
+        drawn_later = elements[elements.index(rect) + 1 :]
+        self.assertEqual(
+            [e.tagName for e in drawn_later if e.tagName in ("text", "image")], []
+        )
+        return rect
+
+    def test_part_titles_are_on_top(self):
+        svg = badgepy.badge(
+            left_text="label",
+            right_text="ok",
+            center_image="image.png",
+            center_color="red",
+            whole_title="Whole",
+            left_title="Left",
+            center_title="Center",
+            right_title="Right",
+        )
+        for text in ("Left", "Center", "Right"):
+            with self.subTest(title=text):
+                self.assertTitleOnTop(svg, text)
+        [whole] = [
+            t
+            for t in minidom.parseString(svg).getElementsByTagName("title")
+            if t.firstChild.data == "Whole"
+        ]
+        self.assertEqual(whole.parentNode.tagName, "svg")
+
+    def test_part_titles_keep_links(self):
+        svg = badgepy.badge(
+            left_text="label",
+            right_text="ok",
+            left_title="Left",
+            right_title="Right",
+            left_link="https://left.example/",
+            right_link="https://right.example/",
+        )
+        for text, link in (
+            ("Left", "https://left.example/"),
+            ("Right", "https://right.example/"),
+        ):
+            with self.subTest(title=text):
+                anchor = self.assertTitleOnTop(svg, text).parentNode
+                self.assertEqual(anchor.tagName, "a")
+                self.assertEqual(anchor.getAttribute("xlink:href"), link)
+
+    def test_no_hit_areas_without_titles_or_links(self):
+        svg = badgepy.badge(left_text="label", right_text="ok", whole_title="Whole")
+        self.assertNotIn("rgba(0,0,0,0)", svg)
+
 
 if __name__ == "__main__":
     unittest.main()
