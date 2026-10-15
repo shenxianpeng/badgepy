@@ -30,6 +30,7 @@ gh-badges library
 """
 
 import base64
+import importlib.metadata
 import mimetypes
 import urllib.parse
 from xml.dom import minidom
@@ -85,13 +86,30 @@ def _remove_blanks(node):
 _EMBED_IMAGE_TIMEOUT = 10
 
 
+def _user_agent() -> str:
+    try:
+        badgepy_version = importlib.metadata.version("badgepy")
+    except importlib.metadata.PackageNotFoundError:
+        badgepy_version = "unknown"
+    return "badgepy/{} (+https://github.com/shenxianpeng/badgepy) {}".format(
+        badgepy_version, requests.utils.default_user_agent()
+    )
+
+
+# Some image hosts, such as Wikimedia, reject requests that only send the
+# generic python-requests User-Agent, so identify badgepy instead.
+_EMBED_IMAGE_HEADERS = {"User-Agent": _user_agent()}
+
+
 def _embed_image(url: str) -> str:
     parsed_url = urllib.parse.urlparse(url)
 
     if parsed_url.scheme == "data":
         return url
     elif parsed_url.scheme.startswith("http"):
-        r = requests.get(url, timeout=_EMBED_IMAGE_TIMEOUT)
+        r = requests.get(
+            url, headers=_EMBED_IMAGE_HEADERS, timeout=_EMBED_IMAGE_TIMEOUT
+        )
         r.raise_for_status()
         content_type = r.headers.get("content-type")
         if content_type is None:
@@ -190,7 +208,8 @@ def badge(
             external image referenced. When True, `logo` must be a HTTP/HTTPS
             URI or a filesystem path. Also, the `badge` call may raise an
             exception if the logo cannot be loaded, is not an image, etc.
-            HTTP/HTTPS logos are fetched with a 10 second timeout.
+            HTTP/HTTPS logos are fetched with a 10 second timeout and a
+            User-Agent that identifies badgepy.
         whole_title: The title attribute to associate with the entire badge.
             See https://developer.mozilla.org/en-US/docs/Web/SVG/Element/title.
         left_title: The title attribute to associate with the left part of the

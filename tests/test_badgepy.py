@@ -15,6 +15,7 @@
 
 import base64
 import doctest
+import importlib.metadata
 import json
 import os.path
 import pathlib
@@ -230,10 +231,10 @@ class TestEmbedImage(unittest.TestCase):
     """Tests for badgepy._embed_image."""
 
     def _serve(self, data, content_type):
-        server = image_server.ImageServer(data, content_type=content_type)
-        server.start_server()
-        self.addCleanup(server.stop_server)
-        return server.logo_url
+        self.server = image_server.ImageServer(data, content_type=content_type)
+        self.server.start_server()
+        self.addCleanup(self.server.stop_server)
+        return self.server.logo_url
 
     def test_data_url(self):
         url = "data:image/png;base64," + PNG_IMAGE_B64
@@ -249,13 +250,43 @@ class TestEmbedImage(unittest.TestCase):
             badgepy._embed_image(url), "data:image/png;base64," + PNG_IMAGE_B64
         )
 
-    def test_http_url_uses_timeout(self):
+    def test_http_url_uses_timeout_and_user_agent(self):
         url = self._serve(PNG_IMAGE, "image/png")
         with mock.patch.object(
             badgepy.requests, "get", wraps=badgepy.requests.get
         ) as get:
             badgepy._embed_image(url)
-        get.assert_called_once_with(url, timeout=badgepy._EMBED_IMAGE_TIMEOUT)
+        get.assert_called_once_with(
+            url,
+            headers=badgepy._EMBED_IMAGE_HEADERS,
+            timeout=badgepy._EMBED_IMAGE_TIMEOUT,
+        )
+
+    def test_http_url_sends_badgepy_user_agent(self):
+        url = self._serve(PNG_IMAGE, "image/png")
+        badgepy._embed_image(url)
+        [headers] = self.server.request_headers
+        self.assertEqual(headers["User-Agent"], badgepy._user_agent())
+
+    def test_user_agent(self):
+        self.assertRegex(
+            badgepy._user_agent(),
+            r"^badgepy/\S+ \(\+https://github\.com/shenxianpeng/badgepy\) "
+            r"python-requests/\S+$",
+        )
+        self.assertTrue(
+            badgepy._user_agent().startswith(
+                "badgepy/" + importlib.metadata.version("badgepy") + " "
+            )
+        )
+
+    def test_user_agent_without_package_metadata(self):
+        with mock.patch.object(
+            badgepy.importlib.metadata,
+            "version",
+            side_effect=importlib.metadata.PackageNotFoundError,
+        ):
+            self.assertTrue(badgepy._user_agent().startswith("badgepy/unknown "))
 
     def test_http_url_timeout_propagates(self):
         with mock.patch.object(
