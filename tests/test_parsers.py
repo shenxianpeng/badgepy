@@ -745,6 +745,31 @@ class TestPyPIParser(unittest.TestCase):
         with self.assertRaises(ValueError):
             pypi.download_count("pkg", "bogus")
 
+    def test_badge_from_pypi_bad_metric(self):
+        from badgepy.parsers import pypi
+
+        with self.assertRaises(ValueError):
+            pypi.badge_from_pypi("pkg", "bogus")
+
+    def test_fetch_recent_downloads_unexpected_response(self):
+        from unittest import mock
+        from badgepy.parsers import pypi
+
+        response = mock.Mock()
+        response.json = mock.Mock(return_value={"error": "not found"})
+        with mock.patch.object(pypi.requests, "get", return_value=response):
+            with self.assertRaisesRegex(ValueError, "unexpected pypistats response"):
+                pypi.fetch_recent_downloads("pkg")
+
+    def test_download_count_missing_metric(self):
+        from unittest import mock
+        from badgepy.parsers import pypi
+
+        fake = self._fake_get({"last_day": 100})
+        with mock.patch.object(pypi.requests, "get", fake):
+            with self.assertRaisesRegex(KeyError, "last_month"):
+                pypi.download_count("pkg", "dm")
+
     def test_badge_from_pypi(self):
         from unittest import mock
         from badgepy.parsers import pypi

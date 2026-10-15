@@ -581,6 +581,94 @@ class TestCliMain(unittest.TestCase):
         self.assertEqual(code, 0, stderr)
         self.assertIn('width="0"', stdout)
 
+    # from-pypi
+
+    def _patch_pypistats(self, **kwargs):
+        from badgepy.parsers import pypi
+
+        if "side_effect" not in kwargs:
+            response = mock.Mock()
+            response.json.return_value = {
+                "data": {"last_day": 12, "last_week": 1234, "last_month": 56789}
+            }
+            kwargs["return_value"] = response
+        return mock.patch.object(pypi.requests, "get", **kwargs)
+
+    def test_from_pypi(self):
+        with self._patch_pypistats() as get:
+            code, stdout, stderr = self._main(
+                "from-pypi", "badgepy", "--metric", "dw", "--timeout", "3"
+            )
+        self.assertEqual(code, 0, stderr)
+        self.assertSvg(stdout)
+        self.assertIn(">downloads<", stdout)
+        self.assertIn(">1.2k/week<", stdout)
+        self.assertIn('fill="#007ec6"', stdout)
+        get.assert_called_once_with(
+            "https://pypistats.org/api/packages/badgepy/recent", timeout=3.0
+        )
+
+    def test_from_pypi_to_file(self):
+        output = os.path.join(self.tmpdir, "downloads.svg")
+        with self._patch_pypistats():
+            code, stdout, stderr = self._main(
+                "from-pypi",
+                "badgepy",
+                "--label",
+                "pypi",
+                "--template",
+                "{count} per {period}",
+                "--color",
+                "green",
+                "-o",
+                output,
+            )
+        self.assertEqual(code, 0, stderr)
+        self.assertEqual(stdout, "")
+        with open(output, encoding="utf-8") as f:
+            svg = f.read()
+        self.assertIn(">pypi<", svg)
+        self.assertIn(">56789 per month<", svg)
+        self.assertIn('fill="#97CA00"', svg)
+
+    def test_from_pypi_errors(self):
+        from badgepy.parsers import pypi
+
+        cases = [
+            # (extra arguments, expected exit code, expected output)
+            ([], 1, None),
+            (["--on-error", "hide"], 0, ['width="0"']),
+            (["--on-error", "badge"], 0, [">downloads<", ">unknown<"]),
+            (
+                [
+                    "--on-error",
+                    "badge",
+                    "--label",
+                    "pypi",
+                    "--error-message",
+                    "n/a",
+                    "--error-color",
+                    "red",
+                ],
+                0,
+                [">pypi<", ">n/a<", 'fill="#e05d44"'],
+            ),
+        ]
+        for extra, expected_code, expected in cases:
+            with self.subTest(extra=extra):
+                with self._patch_pypistats(
+                    side_effect=pypi.requests.ConnectionError("offline")
+                ):
+                    code, stdout, stderr = self._main("from-pypi", "badgepy", *extra)
+                self.assertEqual(code, expected_code, stderr)
+                if expected is None:
+                    self.assertEqual(stdout, "")
+                    self.assertIn("failed to generate badge: offline", stderr)
+                else:
+                    self.assertSvg(stdout)
+                    for text in expected:
+                        self.assertIn(text, stdout)
+
 
 if __name__ == "__main__":
     unittest.main()
