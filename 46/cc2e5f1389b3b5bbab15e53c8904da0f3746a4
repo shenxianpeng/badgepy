@@ -1,0 +1,19 @@
+.github/workflows/ci.yml
+  s_bbb259206f8eb8::t_2cb7fd10d960b8 13,17,27,31,41,45,60,64,77,84
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "46cc2e5f1389b3b5bbab15e53c8904da0f3746a4",
+  "prompts": {},
+  "sessions": {
+    "s_bbb259206f8eb8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ec3f9dad-662a-4dd8-91fd-2b1f64a0cb62",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Xianpeng Shen <xianpeng.shen@gmail.com>"
+    }
+  }
+}
