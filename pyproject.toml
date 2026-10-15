@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "badgepy"
-description = "A library and command-line tool for generating Github-style badges"
+description = "Generate GitHub-style SVG badges locally: a maintained, drop-in fork of pybadges with CI report and preset badges"
 readme = "README.md"
 requires-python = ">=3.10"
 dynamic = ["version"]
@@ -46,8 +46,12 @@ dev = [
 ]
 
 [project.urls]
+homepage = "https://github.com/shenxianpeng/badgepy"
+documentation = "https://github.com/shenxianpeng/badgepy#readme"
 source = "https://github.com/shenxianpeng/badgepy"
 tracker = "https://github.com/shenxianpeng/badgepy/issues"
+changelog = "https://github.com/shenxianpeng/badgepy/releases"
+funding = "https://github.com/sponsors/shenxianpeng"
 
 [project.scripts]
 badgepy = "badgepy.__main__:main"
