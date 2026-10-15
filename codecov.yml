@@ -1,0 +1,13 @@
+# Codecov configuration.
+# Reference: https://docs.codecov.com/docs/codecov-yaml
+
+# `nox -s coverage` measures the badgepy package only (`--cov=badgepy`), so
+# nothing below should reach a report in the first place. These entries are a
+# second line of defence: the uploader used to search the whole tree and
+# picked up files from the nox virtualenv, which do not belong in coverage.
+ignore:
+  - ".nox/**"
+  - "tests/**"
+  - "server-example/**"
+  - "build_golden_images.py"
+  - "noxfile.py"
