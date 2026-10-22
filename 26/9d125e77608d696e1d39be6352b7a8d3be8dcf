@@ -1,0 +1,25 @@
+badgepy/__main__.py
+  s_808bcb54b94641::t_0524338821c934 681-694
+badgepy/output.py
+  s_808bcb54b94641::t_0ab005c4246a45 30
+badgepy/parsers/structured.py
+  s_808bcb54b94641::t_361f80f69d3652 191
+pyproject.toml
+  s_808bcb54b94641::t_636e3c44bd60fd 82-85,87-90
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "269d125e77608d696e1d39be6352b7a8d3be8dcf",
+  "prompts": {},
+  "sessions": {
+    "s_808bcb54b94641": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8f452822-7f74-42c5-8597-23c2eec5567e",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "Xianpeng Shen <xianpeng.shen@gmail.com>"
+    }
+  }
+}
