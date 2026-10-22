@@ -678,25 +678,20 @@ def main():
 
     args = parser.parse_args()
 
-    if args.command is None:
-        # No subcommand: use the original badge generation
-        _cmd_badge(args)
-    elif args.command == "preset":
-        _cmd_preset(args)
-    elif args.command == "from-junit":
-        _cmd_from_junit(args)
-    elif args.command == "from-coverage":
-        _cmd_from_coverage(args)
-    elif args.command == "from-generic":
-        _cmd_from_generic(args)
-    elif args.command == "from-json":
-        _cmd_from_structured(args, "json")
-    elif args.command == "from-toml":
-        _cmd_from_structured(args, "toml")
-    elif args.command == "from-pyproject":
-        _cmd_from_structured(args, "toml")
-    elif args.command == "from-lock":
-        _cmd_from_lock(args)
+    # argparse only ever yields one of these commands (or None when no
+    # subcommand is given, which keeps the original badge generation).
+    handlers = {
+        None: _cmd_badge,
+        "preset": _cmd_preset,
+        "from-junit": _cmd_from_junit,
+        "from-coverage": _cmd_from_coverage,
+        "from-generic": _cmd_from_generic,
+        "from-json": lambda a: _cmd_from_structured(a, "json"),
+        "from-toml": lambda a: _cmd_from_structured(a, "toml"),
+        "from-pyproject": lambda a: _cmd_from_structured(a, "toml"),
+        "from-lock": _cmd_from_lock,
+    }
+    handlers[args.command](args)
 
 
 if __name__ == "__main__":

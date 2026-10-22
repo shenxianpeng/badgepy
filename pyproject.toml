@@ -79,7 +79,15 @@ extend-exclude = ["*.md"]
 # Pin the rule set so that newer ruff releases don't silently widen it.
 select = ["E4", "E7", "E9", "F"]
 
+[tool.coverage.run]
+source = ["badgepy"]
+branch = true
+
 [tool.coverage.report]
+# The whole package is covered; keep it that way: the nox coverage session
+# (run in CI) fails below 100% lines and branches.
+fail_under = 100
+show_missing = true
 exclude_also = [
     'if __name__ == "__main__":',
 ]

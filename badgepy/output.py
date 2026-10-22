@@ -27,9 +27,7 @@ def write_badge(svg: str, output_path: str) -> str:
         The absolute path of the written file.
     """
     output_path = os.path.abspath(output_path)
-    parent_dir = os.path.dirname(output_path)
-    if parent_dir:
-        os.makedirs(parent_dir, exist_ok=True)
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
     with open(output_path, "w", encoding="utf-8") as f:
         f.write(svg)
     return output_path

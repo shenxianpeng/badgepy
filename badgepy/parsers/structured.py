@@ -188,7 +188,7 @@ def select_value(data: Any, query: str | None = None) -> Any:
                     raise KeyError(f"path component not found: {key}")
                 current = current[key]
                 consumed = True
-            elif index is not None:
+            else:
                 if not isinstance(current, list):
                     raise TypeError(f"path component is not a list: {part}")
                 current = current[int(index)]
