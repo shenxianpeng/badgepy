@@ -17,7 +17,7 @@ pybadges 3.0.1 no longer imports on current Python environments:
 Note that virtual environments created with Python 3.12+ no longer include setuptools
 by default, so the second failure can appear even before you upgrade Python.
 
-badgepy removes both dependencies, supports Python 3.10–3.14, and is actively maintained.
+badgepy removes both dependencies, supports Python 3.10–3.15, and is actively maintained.
 
 ## Step 1: Update your dependencies
 

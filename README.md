@@ -6,7 +6,7 @@
 ![versions](https://img.shields.io/pypi/pyversions/badgepy.svg)
 
 > [!NOTE]
-> **badgepy** is a fork of [google/pybadges](https://github.com/google/pybadges) with fixes including added support for Python 3.13 and 3.14, dropped Python 3.7/3.8 support, removal of deprecated `imghdr`, and replacement of `pkg_resources` and [many other fixes](https://github.com/shenxianpeng/badgepy/pulls?q=is%3Apr+is%3Aclosed). This project is actively maintained.
+> **badgepy** is a fork of [google/pybadges](https://github.com/google/pybadges) with fixes including added support for Python 3.13 through 3.15, dropped Python 3.7/3.8 support, removal of deprecated `imghdr`, and replacement of `pkg_resources` and [many other fixes](https://github.com/shenxianpeng/badgepy/pulls?q=is%3Apr+is%3Aclosed). This project is actively maintained.
 >
 > **Coming from pybadges?** pybadges 3.0.1 fails to import on Python 3.13+. badgepy is a drop-in replacement with the same API and output — see the [pybadges Migration Guide](docs/pybadges-migration.md).
 

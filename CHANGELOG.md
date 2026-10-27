@@ -10,6 +10,11 @@ Releases up to and including 1.3.0 are listed on the
 
 ## [Unreleased]
 
+### Added
+
+- Python 3.15 support. The test suite now runs on 3.15 in CI, and the package
+  declares it on PyPI.
+
 ## [2.0.0] - 2026-10-15
 
 The first release to require Python 3.10, and the one that closes every open
