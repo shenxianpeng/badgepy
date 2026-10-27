@@ -82,7 +82,9 @@ jobs:
           persist-credentials: false
       - name: Install system dependencies
         if: ${{ matrix.python-version != '3.10' }}
-        run: sudo apt-get update && sudo apt-get install -y libjpeg-dev
+        # Pillow builds from source where it has no wheel (e.g. Pillow 11 on
+        # Python 3.15); without FreeType headers it builds without ImageFont.
+        run: sudo apt-get update && sudo apt-get install -y libjpeg-dev libfreetype-dev
       - name: Set up Python
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v7.0.0
         with:
