@@ -10,6 +10,17 @@ Releases up to and including 1.3.0 are listed on the
 
 ## [Unreleased]
 
+## [2.0.1] - 2026-10-27
+
+Adds Python 3.15. There are no API or output changes, so upgrading from 2.0.0
+needs no code changes.
+
+### Added
+
+- Python 3.15 support. The test suite now runs on 3.15 in CI, and the package
+  declares it on PyPI.
+  ([#58](https://github.com/shenxianpeng/badgepy/pull/58))
+
 ## [2.0.0] - 2026-10-15
 
 The first release to require Python 3.10, and the one that closes every open
@@ -101,5 +112,6 @@ Coming from pybadges rather than badgepy 1.x? See the
   ([#34](https://github.com/shenxianpeng/badgepy/pull/34),
   [#44](https://github.com/shenxianpeng/badgepy/pull/44))
 
-[Unreleased]: https://github.com/shenxianpeng/badgepy/compare/v2.0.0...HEAD
+[Unreleased]: https://github.com/shenxianpeng/badgepy/compare/v2.0.1...HEAD
+[2.0.1]: https://github.com/shenxianpeng/badgepy/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/shenxianpeng/badgepy/compare/v1.3.0...v2.0.0
