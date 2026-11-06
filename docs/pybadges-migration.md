@@ -1,7 +1,8 @@
 # Migrating from pybadges to badgepy
 
 badgepy is the maintained continuation of [google/pybadges](https://github.com/google/pybadges),
-which was archived in June 2024 (its last release, 3.0.1, dates from October 2023).
+which was archived in August 2025 (its last commit dates from June 2024 and its last
+release, 3.0.1, from October 2023).
 The `badge()` API and the command-line flags are unchanged, so for most projects
 migrating is a one-line dependency change plus a find-and-replace of the import.
 
@@ -12,7 +13,7 @@ pybadges 3.0.1 no longer imports on current Python environments:
 | Environment | `import pybadges` |
 |---|---|
 | Python 3.13+ | `ModuleNotFoundError: No module named 'imghdr'` — `imghdr` was removed from the standard library ([PEP 594](https://peps.python.org/pep-0594/)) |
-| Python 3.12 and earlier, without setuptools or with a setuptools release that no longer ships `pkg_resources` (e.g. 84.0.0) | `ModuleNotFoundError: No module named 'pkg_resources'` |
+| Python 3.12 and earlier, without setuptools or with setuptools 82.0.0 or later, which no longer ships `pkg_resources` | `ModuleNotFoundError: No module named 'pkg_resources'` |
 
 Note that virtual environments created with Python 3.12+ no longer include setuptools
 by default, so the second failure can appear even before you upgrade Python.

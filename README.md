@@ -42,6 +42,8 @@ Both tools produce identical-looking badges, but they work very differently. Her
 - You need zero network dependencies at badge generation time
 
 > 💡 **Already using Shields.io static badges?** See the [Shields.io Migration Guide](docs/shields-migration.md) for a drop-in replacement path.
+>
+> ⚖️ **Comparing Python badge libraries?** See [badgepy, anybadge, genbadge and pybadges compared](docs/comparison.md).
 
 ## Sponsors
 
