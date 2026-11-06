@@ -10,6 +10,21 @@ Releases up to and including 1.3.0 are listed on the
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-11-06
+
+Adds a GitHub Action and a pre-commit hook. The library and the command line are
+unchanged.
+
+### Added
+
+- A GitHub Action: `uses: shenxianpeng/badgepy@v2.1.0` with one badgepy command per line
+  of `args`. It installs badgepy in a private virtual environment and runs each command
+  without a shell. See the
+  [CI Integration Guide](docs/ci-integration.md#use-the-badgepy-action).
+- A pre-commit hook, `id: badgepy`, that regenerates a committed badge and fails the
+  commit when it was out of date. See the
+  [CI Integration Guide](docs/ci-integration.md#pre-commit).
+
 ## [2.0.1] - 2026-10-27
 
 Adds Python 3.15. There are no API or output changes, so upgrading from 2.0.0
@@ -112,6 +127,7 @@ Coming from pybadges rather than badgepy 1.x? See the
   ([#34](https://github.com/shenxianpeng/badgepy/pull/34),
   [#44](https://github.com/shenxianpeng/badgepy/pull/44))
 
-[Unreleased]: https://github.com/shenxianpeng/badgepy/compare/v2.0.1...HEAD
+[Unreleased]: https://github.com/shenxianpeng/badgepy/compare/v2.1.0...HEAD
+[2.1.0]: https://github.com/shenxianpeng/badgepy/compare/v2.0.1...v2.1.0
 [2.0.1]: https://github.com/shenxianpeng/badgepy/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/shenxianpeng/badgepy/compare/v1.3.0...v2.0.0

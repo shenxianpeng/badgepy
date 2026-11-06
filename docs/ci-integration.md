@@ -4,6 +4,32 @@ This guide shows how to use badgepy in CI pipelines to automatically generate ba
 
 ## GitHub Actions
 
+### Use the badgepy action
+
+The action installs badgepy in its own virtual environment, so it doesn't touch your
+job's Python packages, and runs one badgepy command per line of `args`:
+
+```yaml
+- name: Run tests with coverage
+  run: pytest --junitxml=results.xml --cov --cov-report=xml
+
+- name: Generate badges
+  uses: shenxianpeng/badgepy@v2.1.0
+  with:
+    args: |
+      from-coverage coverage.xml -o badges/coverage.svg
+      from-junit results.xml -o badges/tests.svg
+      from-pyproject --query project.version --label version -o badges/version.svg
+```
+
+Each line takes the same arguments as the `badgepy` command, without the word `badgepy`.
+Blank lines and lines starting with `#` are skipped. Quote values that contain spaces,
+and use forward slashes in paths, also on Windows runners. The runner needs Python 3.10
+or later on its `PATH`; GitHub-hosted runners have it, and on other runners add
+`actions/setup-python` first.
+
+The steps below install badgepy with `pip` instead, which works the same way.
+
 ### Generate badges from test results
 
 ```yaml
@@ -77,6 +103,27 @@ Use thresholds when the selected JSON/TOML value is numeric:
       --thresholds "90:brightgreen,80:green,60:yellow,0:red" \
       -o badges/coverage.svg
 ```
+
+## pre-commit
+
+To keep a committed badge in sync with your project, regenerate it in a
+[pre-commit](https://pre-commit.com) hook. This example rebuilds a version badge
+whenever `pyproject.toml` changes:
+
+```yaml
+repos:
+  - repo: https://github.com/shenxianpeng/badgepy
+    rev: v2.1.0
+    hooks:
+      - id: badgepy
+        name: version badge
+        args: [from-pyproject, --query, project.version, --label, version, -o, badges/version.svg]
+        files: ^pyproject\.toml$
+```
+
+If the badge was out of date, the hook writes the new one and fails the commit, as
+formatters do. Stage the updated badge and commit again. Add one hook entry per badge,
+each with its own `args` and `files`.
 
 ## GitLab CI
 

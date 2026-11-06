@@ -253,7 +253,7 @@ badges = badges_from_coverage('tests/coverage.xml')    # {'coverage': '<svg...>'
 svg = badge_from_structured_data('pyproject.toml', query='project.version', label='pypi')
 ```
 
-See the [CI Integration Guide](docs/ci-integration.md) for GitHub Actions, GitLab CI, and Jenkins examples.
+See the [CI Integration Guide](docs/ci-integration.md) for the badgepy GitHub Action, a pre-commit hook, and GitLab CI and Jenkins examples.
 
 ### Output to File
 

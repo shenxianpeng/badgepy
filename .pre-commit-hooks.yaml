@@ -1,0 +1,6 @@
+- id: badgepy
+  name: badgepy
+  description: Regenerate an SVG badge with badgepy, for example a version badge from pyproject.toml, so the committed badge never goes stale.
+  entry: badgepy
+  language: python
+  pass_filenames: false

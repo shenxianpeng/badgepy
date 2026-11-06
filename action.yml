@@ -1,0 +1,97 @@
+name: badgepy
+description: Generate SVG badges from coverage and test reports, pyproject.toml, lock files or plain text, without a badge service.
+author: Xianpeng Shen
+branding:
+  icon: award
+  color: blue
+
+inputs:
+  args:
+    description: >-
+      One badgepy command per line, without the leading "badgepy", for example
+      "from-coverage coverage.xml -o badges/coverage.svg". Blank lines and lines
+      starting with # are skipped. Arguments are split like a POSIX shell does,
+      so quote values that contain spaces, and use forward slashes in paths.
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Install badgepy
+      id: install
+      shell: bash
+      env:
+        ACTION_PATH: ${{ github.action_path }}
+        ACTION_REF: ${{ github.action_ref }}
+      run: |
+        set -euo pipefail
+        python=""
+        for candidate in python3 python; do
+          if command -v "$candidate" >/dev/null 2>&1 &&
+            "$candidate" -c 'import sys; sys.exit(sys.version_info < (3, 10))' >/dev/null 2>&1; then
+            python="$candidate"
+            break
+          fi
+        done
+        if [ -z "$python" ]; then
+          echo "::error title=badgepy::badgepy needs Python 3.10 or later on the runner. Add actions/setup-python before this step."
+          exit 1
+        fi
+
+        # A private virtual environment, so the job's own Python packages are untouched.
+        venv="${RUNNER_TEMP}/badgepy-venv"
+        "$python" -m venv "$venv"
+        if [ -x "$venv/bin/python" ]; then
+          venv_python="$venv/bin/python"
+        else
+          venv_python="$venv/Scripts/python.exe"
+        fi
+
+        # A release tag such as v2.0.1 installs that release from PyPI; any other
+        # ref (a branch, a commit, or "uses: ./") installs the source at that ref.
+        if [[ "$ACTION_REF" =~ ^v([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
+          "$venv_python" -m pip install --quiet --disable-pip-version-check "badgepy==${BASH_REMATCH[1]}"
+        else
+          "$venv_python" -m pip install --quiet --disable-pip-version-check "$ACTION_PATH"
+        fi
+        "$venv_python" -m badgepy --version
+        echo "python=$venv_python" >> "$GITHUB_OUTPUT"
+
+    - name: Generate badges
+      shell: bash
+      env:
+        BADGEPY_ARGS: ${{ inputs.args }}
+        BADGEPY_PYTHON: ${{ steps.install.outputs.python }}
+      run: |
+        "$BADGEPY_PYTHON" - <<'PY'
+        import os
+        import shlex
+        import subprocess
+        import sys
+
+        commands = []
+        for line in os.environ["BADGEPY_ARGS"].splitlines():
+            line = line.strip()
+            if not line or line.startswith("#"):
+                continue
+            try:
+                args = shlex.split(line)
+            except ValueError as error:
+                print(f"::error title=badgepy::Cannot parse {line!r}: {error}")
+                sys.exit(1)
+            if args and args[0] == "badgepy":
+                args = args[1:]
+            commands.append(args)
+
+        if not commands:
+            print("::error title=badgepy::The 'args' input has no badgepy command.")
+            sys.exit(1)
+
+        for args in commands:
+            print(f"::group::badgepy {shlex.join(args)}", flush=True)
+            result = subprocess.run([sys.executable, "-m", "badgepy", *args], stdin=subprocess.DEVNULL)
+            print("::endgroup::", flush=True)
+            if result.returncode:
+                print(f"::error title=badgepy::Command failed: badgepy {shlex.join(args)}")
+                sys.exit(result.returncode)
+        PY

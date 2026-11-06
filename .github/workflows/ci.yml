@@ -92,3 +92,32 @@ jobs:
       - run: |
           pip install nox
           nox -s compatibility
+
+  action:
+    # Runs the action in this repository (action.yml) the way a user's workflow would.
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Generate badges with the action
+        uses: ./
+        with:
+          args: |
+            # Comments and blank lines are skipped.
+
+            preset build passing -o badges/build.svg
+            badgepy from-pyproject --query project.name --label package -o badges/package.svg
+            --left-text "hello world" --right-text ok -o badges/hello.svg
+      - name: Check the badges
+        shell: bash
+        run: |
+          for name in build package hello; do
+            grep -q '<svg' "badges/$name.svg"
+          done
+          grep -q 'hello world' badges/hello.svg
+          grep -q 'badgepy' badges/package.svg
