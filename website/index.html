@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>badgepy playground: make an SVG badge in your browser</title>
+<meta name="description" content="Design a GitHub-style SVG badge in your browser, then copy the SVG or the badgepy command that generates it. badgepy is a Python badge generator that works offline, a maintained fork of pybadges.">
+<link rel="canonical" href="https://shenxianpeng.github.io/badgepy/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%23555'/%3E%3Crect x='8' width='8' height='16' fill='%234c1'/%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg: #ffffff; --panel: #f6f8fa; --text: #1f2328; --muted: #59636e;
+    --border: #d1d9e0; --accent: #0969da; --accent-text: #ffffff; --error: #b3261e;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0d1117; --panel: #151b23; --text: #f0f6fc; --muted: #9198a1;
+      --border: #3d444d; --accent: #4493f8; --accent-text: #0d1117; --error: #ff7b72;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  main { max-width: 960px; margin: 0 auto; padding: 32px 16px 64px; }
+  h1 { font-size: 2rem; margin: 0 0 4px; }
+  h2 { font-size: 1.25rem; margin: 40px 0 12px; }
+  p { margin: 0 0 12px; }
+  a { color: var(--accent); }
+  code, pre, textarea { font: 13px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  .lede { color: var(--muted); max-width: 62ch; }
+  .links { display: flex; flex-wrap: wrap; gap: 4px 16px; margin: 12px 0 0; padding: 0; list-style: none; }
+  .install { display: inline-block; margin-top: 12px; padding: 6px 10px; background: var(--panel); border: 1px solid var(--border); border-radius: 6px; }
+
+  .playground { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 24px; align-items: start; }
+  @media (max-width: 720px) { .playground { grid-template-columns: minmax(0, 1fr); } }
+  .field { margin-bottom: 12px; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  label { display: block; font-size: 0.875rem; font-weight: 600; margin-bottom: 4px; }
+  .hint { font-weight: 400; color: var(--muted); }
+  input, select {
+    width: 100%; padding: 7px 10px; font: inherit; color: inherit;
+    background: var(--bg); border: 1px solid var(--border); border-radius: 6px;
+  }
+  input:focus-visible, select:focus-visible, button:focus-visible, textarea:focus-visible {
+    outline: 2px solid var(--accent); outline-offset: 1px;
+  }
+
+  .preview {
+    display: flex; align-items: center; justify-content: center; min-height: 96px;
+    padding: 16px; background: var(--panel); border: 1px solid var(--border); border-radius: 8px;
+    overflow-x: auto;
+  }
+  .preview img { height: 40px; max-width: none; }
+  #status { margin: 8px 0 16px; font-size: 0.875rem; color: var(--muted); min-height: 1.5em; }
+  #status.error { color: var(--error); }
+
+  .output { margin-bottom: 16px; }
+  .output-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 4px; }
+  .output-head span { font-size: 0.875rem; font-weight: 600; }
+  .actions { display: flex; gap: 8px; }
+  button {
+    padding: 4px 10px; font: inherit; font-size: 0.8125rem; cursor: pointer; color: inherit;
+    background: var(--bg); border: 1px solid var(--border); border-radius: 6px;
+  }
+  button:hover { border-color: var(--accent); }
+  button:disabled { opacity: 0.5; cursor: default; border-color: var(--border); }
+  button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-text); }
+  textarea, pre {
+    width: 100%; margin: 0; padding: 10px; color: inherit; background: var(--panel);
+    border: 1px solid var(--border); border-radius: 6px;
+  }
+  textarea { height: 96px; resize: vertical; }
+  pre { overflow-x: auto; white-space: pre; }
+
+  .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+  .gallery button {
+    display: flex; align-items: center; justify-content: center; min-height: 56px; padding: 12px;
+    background: var(--panel); overflow: hidden;
+  }
+  .gallery img { height: 20px; max-width: 100%; }
+  footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.875rem; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>badgepy</h1>
+    <p class="lede">Generate GitHub-style SVG badges locally, with no external service. Design one below, then copy the SVG, or copy the command that generates it in your own project.</p>
+    <code class="install">pip install badgepy</code>
+    <ul class="links">
+      <li><a href="https://github.com/shenxianpeng/badgepy">GitHub</a></li>
+      <li><a href="https://pypi.org/project/badgepy/">PyPI</a></li>
+      <li><a href="https://github.com/shenxianpeng/badgepy#usage">Usage</a></li>
+      <li><a href="https://github.com/shenxianpeng/badgepy/blob/main/docs/ci-integration.md">CI integration</a></li>
+      <li><a href="https://github.com/shenxianpeng/badgepy/blob/main/docs/pybadges-migration.md">Migrating from pybadges</a></li>
+      <li><a href="https://github.com/shenxianpeng/badgepy/blob/main/docs/shields-migration.md">Migrating from shields.io</a></li>
+    </ul>
+  </header>
+
+  <h2 id="playground">Playground</h2>
+  <div class="playground">
+    <form id="form" autocomplete="off">
+      <div class="field">
+        <label for="left_text">Left text</label>
+        <input id="left_text" value="build">
+      </div>
+      <div class="field">
+        <label for="right_text">Right text <span class="hint">(optional)</span></label>
+        <input id="right_text" value="passing">
+      </div>
+      <div class="row">
+        <div class="field">
+          <label for="left_color">Left color</label>
+          <input id="left_color" list="colors" placeholder="#555">
+        </div>
+        <div class="field">
+          <label for="right_color">Right color</label>
+          <input id="right_color" list="colors" value="brightgreen" placeholder="#007ec6">
+        </div>
+      </div>
+      <div class="field">
+        <label for="style">Style</label>
+        <select id="style">
+          <option value="flat">flat</option>
+          <option value="flat-square">flat-square</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="whole_link">Link <span class="hint">(optional, opened when the badge is clicked)</span></label>
+        <input id="whole_link" type="url" placeholder="https://example.com/">
+      </div>
+      <datalist id="colors">
+        <option value="brightgreen"><option value="green"><option value="yellowgreen">
+        <option value="yellow"><option value="orange"><option value="red">
+        <option value="blue"><option value="grey"><option value="lightgrey">
+        <option value="success"><option value="important"><option value="critical">
+        <option value="informational"><option value="inactive">
+      </datalist>
+    </form>
+
+    <div>
+      <div class="preview"><img id="preview" src="default.svg" alt="Badge preview"></div>
+      <p id="status" role="status">Loading Python in your browser. The first visit downloads about 7 MB.</p>
+
+      <div class="output">
+        <div class="output-head">
+          <span>SVG</span>
+          <div class="actions">
+            <button type="button" data-copy="svg" disabled>Copy</button>
+            <button type="button" id="download" class="primary" disabled>Download .svg</button>
+          </div>
+        </div>
+        <textarea id="svg" readonly aria-label="SVG source"></textarea>
+      </div>
+      <div class="output">
+        <div class="output-head"><span>Command line</span><button type="button" data-copy="cli">Copy</button></div>
+        <pre id="cli"></pre>
+      </div>
+      <div class="output">
+        <div class="output-head"><span>Python</span><button type="button" data-copy="python">Copy</button></div>
+        <pre id="python"></pre>
+      </div>
+    </div>
+  </div>
+
+  <h2 id="gallery">Examples</h2>
+  <p class="lede">Select one to load it into the playground.</p>
+  <div class="gallery" id="gallery-items"></div>
+  <p id="gallery-note" class="lede">Examples appear once Python has loaded.</p>
+
+  <footer>
+    <p id="runtime">This page runs the published badgepy package in your browser with <a href="https://pyodide.org/">Pyodide</a>. Nothing you type leaves your device.</p>
+  </footer>
+</main>
+
+<script type="application/json" id="examples">
+[
+  {"left_text": "build", "right_text": "passing", "right_color": "brightgreen"},
+  {"left_text": "build", "right_text": "failing", "right_color": "red"},
+  {"left_text": "coverage", "right_text": "98%", "right_color": "brightgreen"},
+  {"left_text": "coverage", "right_text": "71%", "right_color": "yellow"},
+  {"left_text": "version", "right_text": "v2.0.1", "right_color": "blue"},
+  {"left_text": "license", "right_text": "Apache-2.0", "right_color": "blue"},
+  {"left_text": "python", "right_text": "3.10+", "right_color": "informational"},
+  {"left_text": "tests", "right_text": "194 passed", "right_color": "success", "style": "flat-square"},
+  {"left_text": "docs", "right_text": "75%", "right_color": "yellowgreen", "style": "flat-square"},
+  {"left_text": "made with", "right_text": "badgepy", "left_color": "#24292f", "right_color": "#8250df"},
+  {"left_text": "PRs", "right_text": "welcome", "right_color": "brightgreen", "style": "flat-square"},
+  {"left_text": "badgepy", "left_color": "blue"}
+]
+</script>
+<script src="https://cdn.jsdelivr.net/pyodide/v314.0.8/full/pyodide.js"></script>
+<script>
+"use strict";
+
+const FIELDS = ["left_text", "right_text", "left_color", "right_color", "style", "whole_link"];
+// What badge() and the CLI use when an argument is left out; omitted from the
+// generated snippets so they stay short.
+const DEFAULTS = { left_color: "#555", right_color: "#007ec6", style: "flat" };
+
+const EXAMPLES = JSON.parse(document.getElementById("examples").textContent);
+
+const el = Object.fromEntries(
+  [...FIELDS, "preview", "status", "svg", "cli", "python", "download", "runtime"].map(
+    (id) => [id, document.getElementById(id)]
+  )
+);
+let renderBadge = null;
+
+function readForm() {
+  const args = {};
+  for (const name of FIELDS) {
+    const value = el[name].value.trim();
+    if (value !== "" && value !== DEFAULTS[name]) args[name] = value;
+  }
+  if (!("left_text" in args)) args.left_text = "";
+  return args;
+}
+
+function shellQuote(value) {
+  if (/^[A-Za-z0-9_.,:\/@%+=-]+$/.test(value)) return value;
+  return "'" + value.replace(/'/g, "'\\''") + "'";
+}
+
+function cliSnippet(args) {
+  const flags = Object.entries(args).map(
+    ([name, value]) => "--" + name.replace(/_/g, "-") + "=" + shellQuote(value)
+  );
+  return ["badgepy", ...flags, "-o badge.svg"].join(" \\\n    ");
+}
+
+function pythonSnippet(args) {
+  const lines = Object.entries(args).map(([name, value]) => `    ${name}=${JSON.stringify(value)},`);
+  return [
+    "from badgepy import badge",
+    "",
+    "svg = badge(",
+    ...lines,
+    ")",
+    'with open("badge.svg", "w", encoding="utf-8") as f:',
+    "    f.write(svg)",
+  ].join("\n");
+}
+
+// The badge is shown through <img>, where a browser neither runs scripts nor
+// follows links inside the SVG, the same way a README displays it.
+function svgDataUrl(svg) {
+  return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+}
+
+function setStatus(text, isError) {
+  el.status.textContent = text;
+  el.status.classList.toggle("error", Boolean(isError));
+}
+
+function update() {
+  const args = readForm();
+  el.cli.textContent = cliSnippet(args);
+  el.python.textContent = pythonSnippet(args);
+  if (!renderBadge) return;
+  try {
+    const svg = renderBadge.callKwargs(args);
+    el.svg.value = svg;
+    el.preview.src = svgDataUrl(svg);
+    setStatus("Rendered by badgepy in your browser.");
+  } catch (error) {
+    // The last line of a Python traceback is the exception message.
+    const lines = String(error.message || error).trim().split("\n");
+    setStatus(lines[lines.length - 1], true);
+  }
+}
+
+function loadExample(example) {
+  for (const name of FIELDS) el[name].value = example[name] || (name === "style" ? "flat" : "");
+  update();
+  document.getElementById("playground").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function buildGallery() {
+  const container = document.getElementById("gallery-items");
+  for (const example of EXAMPLES) {
+    const button = document.createElement("button");
+    button.type = "button";
+    const image = document.createElement("img");
+    image.src = svgDataUrl(renderBadge.callKwargs(example));
+    image.alt = [example.left_text, example.right_text].filter(Boolean).join(": ");
+    button.title = "Load this badge into the playground";
+    button.append(image);
+    button.addEventListener("click", () => loadExample(example));
+    container.append(button);
+  }
+  document.getElementById("gallery-note").hidden = true;
+}
+
+async function copyFrom(button) {
+  const source = el[button.dataset.copy];
+  const text = "value" in source ? source.value : source.textContent;
+  try {
+    await navigator.clipboard.writeText(text);
+    button.textContent = "Copied";
+  } catch {
+    button.textContent = "Copy failed";
+  }
+  setTimeout(() => { button.textContent = "Copy"; }, 1500);
+}
+
+for (const name of FIELDS) el[name].addEventListener("input", update);
+document.getElementById("form").addEventListener("submit", (event) => event.preventDefault());
+for (const button of document.querySelectorAll("[data-copy]")) {
+  button.addEventListener("click", () => copyFrom(button));
+}
+el.download.addEventListener("click", () => {
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(new Blob([el.svg.value], { type: "image/svg+xml" }));
+  link.download = "badge.svg";
+  link.click();
+  URL.revokeObjectURL(link.href);
+});
+
+update();
+
+(async () => {
+  const pyodide = await loadPyodide();
+  await pyodide.loadPackage("micropip");
+  await pyodide.pyimport("micropip").install("badgepy");
+  renderBadge = pyodide.runPython("import badgepy; badgepy.badge");
+  const version = pyodide.runPython("import importlib.metadata; importlib.metadata.version('badgepy')");
+  el.runtime.prepend(`badgepy ${version}. `);
+  for (const button of document.querySelectorAll("button:disabled")) button.disabled = false;
+  update();
+  buildGallery();
+  window.badgepyReady = true;
+})().catch((error) => {
+  setStatus(
+    "Could not load Python in this browser, so the preview is not live. " +
+    "The command-line and Python snippets below still work once badgepy is installed.",
+    true
+  );
+  window.badgepyFailed = String(error);
+});
+</script>
+</body>
+</html>

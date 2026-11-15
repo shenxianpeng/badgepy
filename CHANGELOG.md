@@ -10,6 +10,14 @@ Releases up to and including 1.3.0 are listed on the
 
 ## [Unreleased]
 
+### Added
+
+- An online [playground](https://shenxianpeng.github.io/badgepy/): design a badge
+  in the browser, then copy its SVG or the command line and Python code that
+  generate it. It runs the published package with Pyodide, so nothing needs
+  installing and nothing typed leaves the browser.
+  ([#62](https://github.com/shenxianpeng/badgepy/pull/62))
+
 ## [2.0.1] - 2026-10-27
 
 Adds Python 3.15. There are no API or output changes, so upgrading from 2.0.0
