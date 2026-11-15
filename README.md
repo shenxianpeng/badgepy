@@ -12,6 +12,8 @@
 
 badgepy is a Python library and command-line tool for generating GitHub-style badges as SVG images — no external service required. Badges are rendered locally, offline, and fully under your control. It also provides a **local [shields.io](https://shields.io)-style badge generator** — generate badges from CI reports (JUnit, Cobertura), use preset recipes for build/coverage/version/license badges, and serve them via a Flask server, all without relying on external services.
 
+**Try it in your browser:** the [badgepy playground](https://shenxianpeng.github.io/badgepy/) lets you design a badge and copy its SVG, or the command that generates it, without installing anything.
+
 The visual design follows the [Shields specification](https://github.com/badges/shields/blob/master/spec/SPECIFICATION.md) and is compatible with [Shields.io](https://shields.io).
 
 ## Shields.io vs badgepy
