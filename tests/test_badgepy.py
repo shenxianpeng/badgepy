@@ -38,13 +38,19 @@ PNG_IMAGE_B64 = (
 )
 PNG_IMAGE = base64.b64decode(PNG_IMAGE_B64)
 
+# The logo that embedded-logo.svg embeds, a copy of
+# https://dev.w3.org/SVG/tools/svgweb/samples/svg-files/python.svg, served
+# from a local server so the tests do not depend on the network.
+with open(os.path.join(TEST_DIR, "python-logo.svg"), "rb") as _f:
+    SVG_LOGO = _f.read()
+
 
 class TestbadgepyBadge(unittest.TestCase):
     """Tests for badgepy.badge."""
 
     def setUp(self):
         super().setUp()
-        self._image_server = image_server.ImageServer(PNG_IMAGE)
+        self._image_server = image_server.ImageServer(SVG_LOGO, "image/svg+xml")
         self._image_server.start_server()
 
     def tearDown(self):
@@ -241,8 +247,11 @@ class TestEmbedImage(unittest.TestCase):
         self.assertEqual(url, badgepy._embed_image(url))
 
     def test_http_url(self):
-        url = "https://dev.w3.org/SVG/tools/svgweb/samples/svg-files/python.svg"
-        self.assertRegex(badgepy._embed_image(url), r"^data:image/svg(\+xml)?;base64,")
+        url = self._serve(SVG_LOGO, "image/svg+xml")
+        self.assertEqual(
+            badgepy._embed_image(url),
+            "data:image/svg+xml;base64," + base64.b64encode(SVG_LOGO).decode(),
+        )
 
     def test_http_png_url(self):
         url = self._serve(PNG_IMAGE, "image/png")
@@ -296,8 +305,11 @@ class TestEmbedImage(unittest.TestCase):
                 badgepy._embed_image("https://example.com/logo.png")
 
     def test_not_image_url(self):
+        url = self._serve(
+            b"<!doctype html><title>A page</title>", "text/html; charset=utf-8"
+        )
         with self.assertRaisesRegex(ValueError, 'expected an image, got "text"'):
-            badgepy._embed_image("http://www.google.com/")
+            badgepy._embed_image(url)
 
     def test_http_url_without_content_type(self):
         url = self._serve(PNG_IMAGE, None)
