@@ -10,9 +10,20 @@ Releases up to and including 1.3.0 are listed on the
 
 ## [Unreleased]
 
+### Changed
+
+- The playground link in the package metadata points at
+  <https://shenxianpeng.dev/badgepy/>, the address the site is served from,
+  instead of one that redirects there.
+
+## [2.0.2] - 2026-11-15
+
+Adds the online playground. The package's code and output are unchanged, so
+upgrading from 2.0.1 needs no code changes.
+
 ### Added
 
-- An online [playground](https://shenxianpeng.github.io/badgepy/): design a badge
+- An online [playground](https://shenxianpeng.dev/badgepy/): design a badge
   in the browser, then copy its SVG or the command line and Python code that
   generate it. It runs the published package with Pyodide, so nothing needs
   installing and nothing typed leaves the browser.
@@ -120,6 +131,7 @@ Coming from pybadges rather than badgepy 1.x? See the
   ([#34](https://github.com/shenxianpeng/badgepy/pull/34),
   [#44](https://github.com/shenxianpeng/badgepy/pull/44))
 
-[Unreleased]: https://github.com/shenxianpeng/badgepy/compare/v2.0.1...HEAD
+[Unreleased]: https://github.com/shenxianpeng/badgepy/compare/v2.0.2...HEAD
+[2.0.2]: https://github.com/shenxianpeng/badgepy/compare/v2.0.1...v2.0.2
 [2.0.1]: https://github.com/shenxianpeng/badgepy/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/shenxianpeng/badgepy/compare/v1.3.0...v2.0.0

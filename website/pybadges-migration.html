@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>pybadges fails on Python 3.13 (No module named 'imghdr'): switch to badgepy</title>
+<meta name="description" content="pybadges is archived and raises ModuleNotFoundError: No module named 'imghdr' on Python 3.13, or No module named 'pkg_resources' without setuptools. badgepy is its maintained fork: same API, same output, a two-line change.">
+<link rel="canonical" href="https://shenxianpeng.dev/badgepy/pybadges-migration.html">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%23555'/%3E%3Crect x='8' width='8' height='16' fill='%234c1'/%3E%3C/svg%3E">
+<meta property="og:type" content="article">
+<meta property="og:title" content="pybadges fails on Python 3.13: switch to badgepy">
+<meta property="og:description" content="pybadges is archived and no longer imports on current Python. badgepy is its maintained fork: same API, same output, a two-line change.">
+<meta property="og:url" content="https://shenxianpeng.dev/badgepy/pybadges-migration.html">
+<meta property="og:image" content="https://shenxianpeng.dev/badgepy/social-preview.png">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+  :root {
+    --bg: #ffffff; --panel: #f6f8fa; --text: #1f2328; --muted: #59636e;
+    --border: #d1d9e0; --accent: #0969da;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0d1117; --panel: #151b23; --text: #f0f6fc; --muted: #9198a1;
+      --border: #3d444d; --accent: #4493f8;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  main { max-width: 760px; margin: 0 auto; padding: 32px 16px 64px; }
+  h1 { font-size: 1.75rem; line-height: 1.25; margin: 16px 0 8px; }
+  h2 { font-size: 1.25rem; margin: 36px 0 10px; }
+  p, ul, ol { margin: 0 0 14px; }
+  a { color: var(--accent); }
+  code, pre { font: 13px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  code { padding: 1px 4px; background: var(--panel); border-radius: 4px; }
+  pre {
+    margin: 0 0 14px; padding: 12px; overflow-x: auto; background: var(--panel);
+    border: 1px solid var(--border); border-radius: 6px;
+  }
+  pre code { padding: 0; background: none; }
+  .lede { color: var(--muted); }
+  .crumb { font-size: 0.875rem; }
+  table { width: 100%; border-collapse: collapse; margin: 0 0 14px; }
+  th, td { padding: 8px 10px; text-align: left; vertical-align: top; border: 1px solid var(--border); }
+  th { background: var(--panel); }
+  .table-wrap { overflow-x: auto; }
+  footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.875rem; }
+</style>
+</head>
+<body>
+<main>
+  <p class="crumb"><a href="./">badgepy</a> / Migrating from pybadges</p>
+  <h1>pybadges fails on Python 3.13: switch to badgepy</h1>
+  <p class="lede">pybadges is archived and its last release no longer imports on current Python. badgepy is its maintained fork, with the same API and the same output, so the fix is a two-line change.</p>
+
+  <h2 id="errors">The errors</h2>
+  <p>On Python 3.13 and later, <code>import pybadges</code> stops with:</p>
+<pre><code>  File ".../site-packages/pybadges/__init__.py", line 33, in &lt;module&gt;
+    import imghdr
+ModuleNotFoundError: No module named 'imghdr'</code></pre>
+  <p>On Python 3.12 and earlier it stops with the following, unless an older setuptools is installed:</p>
+<pre><code>  File ".../site-packages/pybadges/precalculated_text_measurer.py", line 21, in &lt;module&gt;
+    import pkg_resources
+ModuleNotFoundError: No module named 'pkg_resources'</code></pre>
+
+  <h2 id="cause">Why it happens</h2>
+  <ul>
+    <li><code>imghdr</code> was removed from the Python standard library in 3.13 (<a href="https://peps.python.org/pep-0594/">PEP 594</a>).</li>
+    <li><code>pkg_resources</code> comes from setuptools, which virtual environments created with Python 3.12 or later no longer include. Current setuptools releases no longer ship it at all.</li>
+    <li><a href="https://github.com/google/pybadges">google/pybadges</a> was archived in August 2025. Its last release, 3.0.1, dates from October 2023, so no pybadges release fixes either error.</li>
+  </ul>
+
+  <h2 id="fix">The fix</h2>
+  <p>Replace the dependency:</p>
+<pre><code>- pybadges==3.0.1
++ badgepy</code></pre>
+  <p>Replace the import:</p>
+<pre><code>- from pybadges import badge
++ from badgepy import badge</code></pre>
+  <p>On the command line, <code>python -m pybadges</code> becomes <code>badgepy</code> (or <code>python -m badgepy</code>), with the same flags.</p>
+  <p>To rename every reference in a repository at once:</p>
+<pre><code>git grep -l pybadges -- '*.py' | xargs perl -pi -e 's/\bpybadges\b/badgepy/g'</code></pre>
+
+  <h2 id="same">What stays the same</h2>
+  <div class="table-wrap">
+  <table>
+    <tr><th>API</th><td><code>badgepy.badge()</code> accepts every pybadges argument, in the same order, so existing calls work unchanged.</td></tr>
+    <tr><th>Output</th><td>For the same arguments badgepy produces the same SVG as pybadges 3.0.1, so stored badges and golden-image tests keep matching. The exceptions are two bug fixes: badges with part titles, and badges with a center image but no link.</td></tr>
+    <tr><th>Command line</th><td>Every pybadges flag is supported with the same meaning.</td></tr>
+    <tr><th>Python</th><td>badgepy 2 supports Python 3.10 through 3.15. For Python 3.9, pin <code>badgepy&gt;=1.3,&lt;2</code>.</td></tr>
+  </table>
+  </div>
+
+  <h2 id="more">More</h2>
+  <ul>
+    <li>The <a href="https://github.com/shenxianpeng/badgepy/blob/main/docs/pybadges-migration.md">full migration guide</a> lists every renamed module and every behavior change.</li>
+    <li>Try badgepy without installing it in the <a href="./">playground</a>.</li>
+    <li><a href="https://pypi.org/project/badgepy/">badgepy on PyPI</a> and <a href="https://github.com/shenxianpeng/badgepy">on GitHub</a>.</li>
+  </ul>
+
+  <footer>
+    <p>badgepy is licensed under Apache-2.0, like pybadges.</p>
+  </footer>
+</main>
+</body>
+</html>
