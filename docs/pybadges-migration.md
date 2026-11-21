@@ -1,7 +1,7 @@
 # Migrating from pybadges to badgepy
 
 badgepy is the maintained continuation of [google/pybadges](https://github.com/google/pybadges),
-which was archived in June 2024 (its last release, 3.0.1, dates from October 2023).
+which was archived in August 2025 (its last release, 3.0.1, dates from October 2023).
 The `badge()` API and the command-line flags are unchanged, so for most projects
 migrating is a one-line dependency change plus a find-and-replace of the import.
 

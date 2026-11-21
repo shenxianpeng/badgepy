@@ -20,7 +20,9 @@ Python has loaded, the choices its form offers, and its examples.
 
 import html.parser
 import json
+import os
 import os.path
+import re
 import unittest
 
 import badgepy
@@ -90,6 +92,71 @@ class TestWebsite(unittest.TestCase):
             with self.subTest(example=example):
                 self.assertLessEqual(set(example), fields)
                 self.assertTrue(badgepy.badge(**example).startswith("<svg"))
+
+
+SITE_URL = "https://shenxianpeng.dev/badgepy/"
+
+
+class _Head(html.parser.HTMLParser):
+    """Collects a page's canonical URL, its og:image and its relative links."""
+
+    def __init__(self):
+        super().__init__()
+        self.canonical = None
+        self.og_image = None
+        self.links = []
+
+    def handle_starttag(self, tag, attrs):
+        attrs = dict(attrs)
+        if tag == "link" and attrs.get("rel") == "canonical":
+            self.canonical = attrs["href"]
+        elif tag == "meta" and attrs.get("property") == "og:image":
+            self.og_image = attrs["content"]
+        elif tag == "a" and "://" not in attrs.get("href", "://"):
+            self.links.append(attrs["href"])
+
+
+class TestSiteFiles(unittest.TestCase):
+    """The pages, the sitemap and llms.txt name each other by URL; a renamed or
+    deleted file would leave a dead link that nothing else notices."""
+
+    def _local_file(self, url):
+        self.assertTrue(url.startswith(SITE_URL), url)
+        name = url[len(SITE_URL) :].split("#")[0] or "index.html"
+        path = os.path.join(WEBSITE_DIR, name)
+        self.assertTrue(os.path.isfile(path), f"{url} has no file {name}")
+        return name
+
+    def test_sitemap_lists_every_page_at_its_canonical_url(self):
+        with open(os.path.join(WEBSITE_DIR, "sitemap.xml"), encoding="utf-8") as f:
+            locs = re.findall(r"<loc>(.*?)</loc>", f.read())
+        pages = sorted(n for n in os.listdir(WEBSITE_DIR) if n.endswith(".html"))
+        self.assertEqual(sorted(self._local_file(loc) for loc in locs), pages)
+        for name in pages:
+            with self.subTest(page=name):
+                head = _Head()
+                with open(os.path.join(WEBSITE_DIR, name), encoding="utf-8") as f:
+                    head.feed(f.read())
+                self.assertIn(head.canonical, locs)
+                self.assertEqual(self._local_file(head.canonical), name)
+                self._local_file(head.og_image)
+                for link in head.links:
+                    # "./" is the directory's index page; "#section" is this page.
+                    target = link.split("#")[0]
+                    if target in ("", "./"):
+                        target = "index.html" if target else name
+                    self.assertTrue(
+                        os.path.isfile(os.path.join(WEBSITE_DIR, target)), link
+                    )
+
+    def test_llms_txt_links_to_site_pages_that_exist(self):
+        with open(os.path.join(WEBSITE_DIR, "llms.txt"), encoding="utf-8") as f:
+            urls = re.findall(r"\]\((https?://[^)]+)\)", f.read())
+        site_urls = [url for url in urls if url.startswith(SITE_URL)]
+        self.assertTrue(site_urls)
+        for url in site_urls:
+            with self.subTest(url=url):
+                self._local_file(url)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,28 @@
+# badgepy
+
+> badgepy is a Python library and command-line tool that generates GitHub-style (shields.io-style) SVG badges locally, with no badge service. It is the maintained fork of google/pybadges, which is archived, and a drop-in replacement for it.
+
+Key facts:
+
+- Install with `pip install badgepy`. Requires Python 3.10 or later; tested through 3.15.
+- Library: `from badgepy import badge`, then `svg = badge(left_text="coverage", right_text="98%", right_color="brightgreen")`. `badge()` returns the SVG as a string.
+- Command line: `badgepy --left-text=build --right-text=passing --right-color=brightgreen -o badge.svg`.
+- pybadges 3.0.1 no longer imports on current Python. It raises `ModuleNotFoundError: No module named 'imghdr'` on Python 3.13 and later, and `ModuleNotFoundError: No module named 'pkg_resources'` on earlier versions unless an older setuptools is installed. No pybadges release fixes this. The fix is to replace `pybadges` with `badgepy` in the requirements and in the imports; the `badge()` arguments and the output are the same.
+- Beyond pybadges, badgepy generates badges from JUnit XML and Cobertura coverage reports (`badgepy from-junit`, `badgepy from-coverage`), from JSON, TOML, `pyproject.toml` and lock files, and from presets (`badgepy preset build passing`).
+- Styles: `flat` (default) and `flat-square`.
+- License: Apache-2.0.
+
+## Docs
+
+- [Playground](https://shenxianpeng.dev/badgepy/): design a badge in the browser and copy the SVG, the command line or the Python code
+- [Migrating from pybadges](https://shenxianpeng.dev/badgepy/pybadges-migration.html): the errors, their cause and the two-line fix
+- [README](https://raw.githubusercontent.com/shenxianpeng/badgepy/main/README.md): installation, command-line and library usage, presets, CI report badges
+- [Full pybadges migration guide](https://raw.githubusercontent.com/shenxianpeng/badgepy/main/docs/pybadges-migration.md): renamed modules and behavior changes
+- [CI integration guide](https://raw.githubusercontent.com/shenxianpeng/badgepy/main/docs/ci-integration.md): GitHub Actions, GitLab CI and Jenkins examples
+- [Migrating from shields.io](https://raw.githubusercontent.com/shenxianpeng/badgepy/main/docs/shields-migration.md): replacing static shields.io badges
+
+## Optional
+
+- [Changelog](https://raw.githubusercontent.com/shenxianpeng/badgepy/main/CHANGELOG.md): what changed in each release, with upgrade notes
+- [PyPI](https://pypi.org/project/badgepy/)
+- [Source](https://github.com/shenxianpeng/badgepy)

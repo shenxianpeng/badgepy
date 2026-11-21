@@ -5,16 +5,21 @@
 [![pypi](https://img.shields.io/pypi/v/badgepy.svg)](https://pypi.org/project/badgepy/)
 ![versions](https://img.shields.io/pypi/pyversions/badgepy.svg)
 
+**Generate GitHub-style SVG badges on your own machine, with no badge service involved.**
+
+A badge fetched from a hosted service breaks when that service is down, rate-limited or blocked, cannot be made offline or behind a firewall, and can only show data the service is able to reach. badgepy renders the badge locally instead, from Python or the command line, so CI can build it from your own test and coverage reports and publish it next to your code.
+
+- **A Python API and a CLI.** `badge()` returns the SVG as a string; the `badgepy` command writes it to a file.
+- **Badges from CI reports.** Read JUnit XML and Cobertura coverage reports, or a value from JSON, TOML, `pyproject.toml` and lock files.
+- **Presets** for build, coverage, version, license and progress badges.
+- **The shields.io look.** `flat` and `flat-square` styles, named colors, logos, links and tooltips, following the [Shields specification](https://github.com/badges/shields/blob/master/spec/SPECIFICATION.md).
+- **No network needed.** Rendering is offline; only embedding a remote image makes a request.
+- **A drop-in replacement for pybadges**, on Python 3.10 through 3.15.
+
+**Try it in your browser:** the [badgepy playground](https://shenxianpeng.dev/badgepy/) lets you design a badge and copy its SVG, or the command that generates it, without installing anything.
+
 > [!NOTE]
-> **badgepy** is a fork of [google/pybadges](https://github.com/google/pybadges) with fixes including added support for Python 3.13 through 3.15, dropped Python 3.7/3.8 support, removal of deprecated `imghdr`, and replacement of `pkg_resources` and [many other fixes](https://github.com/shenxianpeng/badgepy/pulls?q=is%3Apr+is%3Aclosed). This project is actively maintained.
->
-> **Coming from pybadges?** pybadges 3.0.1 fails to import on Python 3.13+. badgepy is a drop-in replacement with the same API and output — see the [pybadges Migration Guide](docs/pybadges-migration.md).
-
-badgepy is a Python library and command-line tool for generating GitHub-style badges as SVG images — no external service required. Badges are rendered locally, offline, and fully under your control. It also provides a **local [shields.io](https://shields.io)-style badge generator** — generate badges from CI reports (JUnit, Cobertura), use preset recipes for build/coverage/version/license badges, and serve them via a Flask server, all without relying on external services.
-
-**Try it in your browser:** the [badgepy playground](https://shenxianpeng.github.io/badgepy/) lets you design a badge and copy its SVG, or the command that generates it, without installing anything.
-
-The visual design follows the [Shields specification](https://github.com/badges/shields/blob/master/spec/SPECIFICATION.md) and is compatible with [Shields.io](https://shields.io).
+> **Coming from pybadges?** [google/pybadges](https://github.com/google/pybadges) is archived, and pybadges 3.0.1 no longer imports on current Python: `ModuleNotFoundError: No module named 'imghdr'` on Python 3.13 and later, and `ModuleNotFoundError: No module named 'pkg_resources'` on earlier versions unless an older setuptools is installed. badgepy is its maintained fork, with the same API and output. Replace `pybadges` with `badgepy` in your requirements and imports, and see the [pybadges Migration Guide](docs/pybadges-migration.md).
 
 ## Shields.io vs badgepy
 
@@ -44,23 +49,6 @@ Both tools produce identical-looking badges, but they work very differently. Her
 - You need zero network dependencies at badge generation time
 
 > 💡 **Already using Shields.io static badges?** See the [Shields.io Migration Guide](docs/shields-migration.md) for a drop-in replacement path.
-
-## Sponsors
-
-<p align="center">
-  <a href="https://thanks.dev/r/canonical">
-    <img src="https://avatars.githubusercontent.com/u/53057619?s=200&v=4" alt="Canonical" width="180">
-  </a>
-</p>
-
-badgepy is supported by [Canonical](https://canonical.com/) through
-[thanks.dev](https://thanks.dev/r/canonical). Thank you, Canonical, for
-supporting open source maintainers and helping make continued maintenance of
-badgepy possible.
-
-If your team depends on badgepy or wants to support independent open source
-maintenance, please consider sponsoring the project through thanks.dev or
-[GitHub Sponsors](https://github.com/sponsors/shenxianpeng).
 
 ## Getting Started
 
@@ -278,6 +266,23 @@ badgepy --left-text=build --right-text=passing --right-color=green -o badges/bui
 - **Right-to-left languages**: Arabic, Hebrew, and other RTL scripts are not explicitly supported; the text direction may be incorrect:
 
   ![saying-arabic](tests/golden-images/saying-arabic.svg)
+
+## Sponsors
+
+<p align="center">
+  <a href="https://thanks.dev/r/canonical">
+    <img src="https://avatars.githubusercontent.com/u/53057619?s=200&v=4" alt="Canonical" width="180">
+  </a>
+</p>
+
+badgepy is supported by [Canonical](https://canonical.com/) through
+[thanks.dev](https://thanks.dev/r/canonical). Thank you, Canonical, for
+supporting open source maintainers and helping make continued maintenance of
+badgepy possible.
+
+If your team depends on badgepy or wants to support independent open source
+maintenance, please consider sponsoring the project through thanks.dev or
+[GitHub Sponsors](https://github.com/sponsors/shenxianpeng).
 
 ## Development
 
