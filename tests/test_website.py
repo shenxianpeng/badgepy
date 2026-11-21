@@ -23,6 +23,7 @@ import json
 import os
 import os.path
 import re
+import unicodedata
 import unittest
 
 import badgepy
@@ -92,6 +93,16 @@ class TestWebsite(unittest.TestCase):
             with self.subTest(example=example):
                 self.assertLessEqual(set(example), fields)
                 self.assertTrue(badgepy.badge(**example).startswith("<svg"))
+
+    def test_examples_include_cjk_text(self):
+        # Shows off that CJK text is measured at full width, not squeezed.
+        self.assertTrue(
+            any(
+                unicodedata.east_asian_width(c) in ("W", "F")
+                for example in self.page.examples
+                for c in example.get("left_text", "") + example.get("right_text", "")
+            )
+        )
 
 
 SITE_URL = "https://shenxianpeng.dev/badgepy/"
