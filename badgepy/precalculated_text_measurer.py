@@ -19,9 +19,14 @@ Uses a precalculated set of metrics to calculate the string length.
 import json
 import importlib.resources
 import lzma
+import unicodedata
 from typing import cast, Mapping, TextIO
 
 from badgepy import text_measurer
+
+# The width of one em at the 110pt the tables are measured at, which is also
+# the font-size the badge template renders text at.
+_EM_WIDTH = 110.0
 
 
 class PrecalculatedTextMeasurer(text_measurer.TextMeasurer):
@@ -55,10 +60,25 @@ class PrecalculatedTextMeasurer(text_measurer.TextMeasurer):
         """Returns the width, in pixels, of a string in DejaVu Sans 110pt."""
         width = 0
         for index, c in enumerate(text):
-            width += self._char_to_width.get(c, self._default_character_width)
+            char_width = self._char_to_width.get(c)
+            if char_width is None:
+                char_width = self._missing_character_width(c)
+            width += char_width
             width -= self._pair_to_kern.get(text[index : index + 2], 0)
 
         return width
+
+    def _missing_character_width(self, c: str) -> float:
+        """The width of a character the tables do not cover.
+
+        The browser draws such a character with a fallback font. Wide and
+        fullwidth characters (CJK ideographs, kana, Hangul, fullwidth forms)
+        are one em wide in those fonts; the mean DejaVu Sans width is about
+        30% narrower, which squeezed CJK text together.
+        """
+        if unicodedata.east_asian_width(c) in ("W", "F"):
+            return _EM_WIDTH
+        return self._default_character_width
 
     @staticmethod
     def from_json(f: TextIO) -> "PrecalculatedTextMeasurer":

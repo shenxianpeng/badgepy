@@ -16,6 +16,16 @@ Releases up to and including 1.3.0 are listed on the
   <https://shenxianpeng.dev/badgepy/>, the address the site is served from,
   instead of one that redirects there.
 
+### Fixed
+
+- Chinese, Japanese and Korean text no longer renders squeezed together.
+  Characters missing from the width table were all measured at the average
+  width of a DejaVu Sans character, about 30% narrower than the full width
+  CJK fonts draw them at, and the badge then compressed the text into that
+  width. Wide and fullwidth characters are now measured at one em.
+  **This changes the SVG of badges whose text contains such characters**;
+  badges without them are byte-for-byte unchanged.
+
 ## [2.0.2] - 2026-11-15
 
 Adds the online playground. The package's code and output are unchanged, so

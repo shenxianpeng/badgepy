@@ -259,9 +259,11 @@ badgepy --left-text=build --right-text=passing --right-color=green -o badges/bui
 
   ![saying-russian](tests/golden-images/saying-russian.svg)
 
-  Glyphs not present in Deja Vu Sans (the default font) may render poorly:
+  Chinese, Japanese and Korean text is measured at the full width CJK fonts draw it at:
 
   ![saying-chinese](tests/golden-images/saying-chinese.svg)
+
+  Other glyphs not present in DejaVu Sans (the default font) are measured at an average width, so they may render slightly too wide or too narrow.
 
 - **Right-to-left languages**: Arabic, Hebrew, and other RTL scripts are not explicitly supported; the text direction may be incorrect:
 

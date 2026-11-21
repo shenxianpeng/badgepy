@@ -89,7 +89,7 @@ ModuleNotFoundError: No module named 'pkg_resources'</code></pre>
   <div class="table-wrap">
   <table>
     <tr><th>API</th><td><code>badgepy.badge()</code> accepts every pybadges argument, in the same order, so existing calls work unchanged.</td></tr>
-    <tr><th>Output</th><td>For the same arguments badgepy produces the same SVG as pybadges 3.0.1, so stored badges and golden-image tests keep matching. The exceptions are two bug fixes: badges with part titles, and badges with a center image but no link.</td></tr>
+    <tr><th>Output</th><td>For the same arguments badgepy produces the same SVG as pybadges 3.0.1, so stored badges and golden-image tests keep matching. The exceptions are three bug fixes: badges with part titles, badges with a center image but no link, and badges with Chinese, Japanese or Korean text, which pybadges squeezed together.</td></tr>
     <tr><th>Command line</th><td>Every pybadges flag is supported with the same meaning.</td></tr>
     <tr><th>Python</th><td>badgepy 2 supports Python 3.10 through 3.15. For Python 3.9, pin <code>badgepy&gt;=1.3,&lt;2</code>.</td></tr>
   </table>
