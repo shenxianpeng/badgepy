@@ -15,6 +15,9 @@ Releases up to and including 1.3.0 are listed on the
 - The playground link in the package metadata points at
   <https://shenxianpeng.dev/badgepy/>, the address the site is served from,
   instead of one that redirects there.
+- The `pil-measurement` extra requires Pillow 9.1 or later, up from 6. The
+  Pillow measurer already needed 8.0 for `getbbox`, and now uses the
+  `ImageFont.Layout` enum that 9.1 added.
 
 ### Fixed
 
@@ -23,6 +26,11 @@ Releases up to and including 1.3.0 are listed on the
   width of a DejaVu Sans character, about 30% narrower than the full width
   CJK fonts draw them at, and the badge then compressed the text into that
   width. Wide and fullwidth characters are now measured at one em.
+  The opt-in Pillow measurer (`--use-pil-text-measurer`) had the same problem
+  in a worse form: it measured the font's box for a missing glyph, about 40%
+  narrower than the em. It now measures a wide or fullwidth character the
+  font lacks at one em too, and still measures from the font every
+  character the font has.
   **This changes the SVG of badges whose text contains such characters**;
   badges without them are byte-for-byte unchanged.
 

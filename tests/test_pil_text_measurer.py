@@ -28,6 +28,11 @@ class TestPilMeasurer(unittest.TestCase):
         cls._tmpdir = tempfile.TemporaryDirectory()
         cls.font_path = os.path.join(cls._tmpdir.name, "test-font.ttf")
         fonts.build_test_font(cls.font_path)
+        # The same font plus a wide character, ARIES, 800 units wide.
+        cls.wide_font_path = os.path.join(cls._tmpdir.name, "wide-font.ttf")
+        fonts.build_test_font(
+            cls.wide_font_path, {**fonts.CHARACTERS, "♈": ("aries", 800)}
+        )
 
     @classmethod
     def tearDownClass(cls):
@@ -48,6 +53,27 @@ class TestPilMeasurer(unittest.TestCase):
         self.assertEqual(width(""), 0)
         self.assertAlmostEqual(width("Aa"), width("A") + width("a"), delta=1)
         self.assertAlmostEqual(width("AAA"), 3 * width("A"), delta=1)
+
+    def test_missing_wide_characters_are_one_em(self):
+        # The font lacks these, so it would draw its 500 unit .notdef box (55
+        # wide); a browser draws them with a fallback font, one em (110) wide.
+        for c in ("构", "テ", "빌", "Ａ"):
+            with self.subTest(character=c):
+                self.assertAlmostEqual(self.measurer.text_width(c), 110, delta=1)
+
+    def test_mixed_text_adds_up(self):
+        width = self.measurer.text_width
+        self.assertAlmostEqual(width("A构"), width("A") + 110, delta=1)
+        self.assertAlmostEqual(width("构构"), 220, delta=1)
+
+    def test_missing_narrow_characters_keep_the_notdef_width(self):
+        # Not wide, so unchanged: still measured as the .notdef box.
+        self.assertAlmostEqual(self.measurer.text_width("b"), 55, delta=1)
+
+    def test_wide_characters_the_font_has_are_measured_from_the_font(self):
+        measurer = pil_text_measurer.PilMeasurer(self.wide_font_path)
+        self.assertAlmostEqual(measurer.text_width("♈"), 88, delta=1)
+        self.assertAlmostEqual(measurer.text_width("构"), 110, delta=1)
 
     def test_missing_font_file(self):
         with self.assertRaises(OSError):
