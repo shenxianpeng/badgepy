@@ -10,14 +10,22 @@ Releases up to and including 1.3.0 are listed on the
 
 ## [Unreleased]
 
+## [2.0.3] - 2026-11-21
+
+Fixes Chinese, Japanese and Korean text being squeezed together. Badges with
+such text come out wider than before; all other badges are byte-for-byte
+unchanged, so upgrading from 2.0.2 needs no code changes.
+
 ### Changed
 
 - The playground link in the package metadata points at
   <https://shenxianpeng.dev/badgepy/>, the address the site is served from,
   instead of one that redirects there.
+  ([#63](https://github.com/shenxianpeng/badgepy/pull/63))
 - The `pil-measurement` extra requires Pillow 9.1 or later, up from 6. The
   Pillow measurer already needed 8.0 for `getbbox`, and now uses the
   `ImageFont.Layout` enum that 9.1 added.
+  ([#64](https://github.com/shenxianpeng/badgepy/pull/64))
 
 ### Fixed
 
@@ -33,6 +41,7 @@ Releases up to and including 1.3.0 are listed on the
   character the font has.
   **This changes the SVG of badges whose text contains such characters**;
   badges without them are byte-for-byte unchanged.
+  ([#64](https://github.com/shenxianpeng/badgepy/pull/64))
 
 ## [2.0.2] - 2026-11-15
 
@@ -149,7 +158,8 @@ Coming from pybadges rather than badgepy 1.x? See the
   ([#34](https://github.com/shenxianpeng/badgepy/pull/34),
   [#44](https://github.com/shenxianpeng/badgepy/pull/44))
 
-[Unreleased]: https://github.com/shenxianpeng/badgepy/compare/v2.0.2...HEAD
+[Unreleased]: https://github.com/shenxianpeng/badgepy/compare/v2.0.3...HEAD
+[2.0.3]: https://github.com/shenxianpeng/badgepy/compare/v2.0.2...v2.0.3
 [2.0.2]: https://github.com/shenxianpeng/badgepy/compare/v2.0.1...v2.0.2
 [2.0.1]: https://github.com/shenxianpeng/badgepy/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/shenxianpeng/badgepy/compare/v1.3.0...v2.0.0
