@@ -86,6 +86,59 @@ class TestPrecalculatedTextMeasurer(unittest.TestCase):
         self.assertEqual(measurer.text_width("ab"), 7)
 
 
+class TestMissingCharacters(unittest.TestCase):
+    """Characters the tables lack are drawn by a fallback font in the browser."""
+
+    def setUp(self):
+        self.measurer = PrecalculatedTextMeasurer(
+            default_character_width=5, char_to_width={"a": 3, "中": 7}, pair_to_kern={}
+        )
+
+    def test_wide_and_fullwidth_characters_are_one_em(self):
+        # Chinese, Japanese kana, Korean Hangul, and a fullwidth Latin letter.
+        for c in ("构", "テ", "빌", "Ａ"):
+            with self.subTest(character=c):
+                self.assertEqual(self.measurer.text_width(c), 110)
+
+    def test_other_missing_characters_use_the_mean_width(self):
+        # Not wide: Thai, and a halfwidth katakana.
+        for c in ("ก", "ｱ"):
+            with self.subTest(character=c):
+                self.assertEqual(self.measurer.text_width(c), 5)
+
+    def test_a_tabled_width_wins_over_the_em(self):
+        self.assertEqual(self.measurer.text_width("中"), 7)
+
+    def test_mixed_text_adds_up(self):
+        self.assertEqual(self.measurer.text_width("a构ก"), 3 + 110 + 5)
+
+
+class TestDefaultMeasurerWidths(unittest.TestCase):
+    """The packaged tables, against widths measured in Chromium.
+
+    The text was rendered in a <span> at 110px with the badge template's font
+    stack (DejaVu Sans,Verdana,Geneva,sans-serif); CJK fell back to
+    WenQuanYi Zen Hei.
+    """
+
+    RENDERED = {
+        "build": 271,
+        "passing": 422,
+        "构建": 220,
+        "构建 v2.0": 495,
+        "빌드": 220,
+        "ＡＢＣ": 330,
+    }
+
+    def test_within_two_percent_of_the_rendered_width(self):
+        measurer = PrecalculatedTextMeasurer.default()
+        for text, rendered in self.RENDERED.items():
+            with self.subTest(text=text):
+                self.assertAlmostEqual(
+                    measurer.text_width(text), rendered, delta=rendered * 0.02
+                )
+
+
 class TestDefaultMeasurer(unittest.TestCase):
     """Tests for loading the packaged widths in PrecalculatedTextMeasurer.default."""
 

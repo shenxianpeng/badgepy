@@ -78,9 +78,11 @@ should be replaced with `importlib.metadata.version("badgepy")` as shown above.
 
 - **Rendered output**: for the same arguments, badgepy produces the same SVG markup as
   pybadges 3.0.1, so golden-image tests and cached badges keep matching. The only
-  exceptions are the two fixes listed under [Behavior changes](#behavior-changes):
-  badges with part titles, and badges with a center image but no link.
-- **Text measurement**: the same pre-calculated DejaVu Sans width table is used by default,
+  exceptions are the three fixes listed under [Behavior changes](#behavior-changes):
+  badges with part titles, badges with a center image but no link, and badges with
+  Chinese, Japanese or Korean text.
+- **Text measurement**: the same pre-calculated DejaVu Sans width table is used by default
+  (characters it lacks are measured as described under [Behavior changes](#behavior-changes)),
   and the Pillow measurer is still available via `--use-pil-text-measurer`.
 
 ## Behavior changes
@@ -101,6 +103,11 @@ should be replaced with `importlib.metadata.version("badgepy")` as shown above.
   ([google/pybadges#26](https://github.com/google/pybadges/issues/26)).
 - **Center image without a link**: a badge with `center_image` but no `center_link` or
   `whole_link` no longer contains a link to the relative URL `None`.
+- **Chinese, Japanese and Korean text**: characters missing from the width table, which
+  include all CJK characters, were measured at the average width of a DejaVu Sans
+  character. That is about 30% narrower than the full width CJK fonts draw them at, so
+  pybadges squeezed CJK text together. badgepy measures wide and fullwidth characters
+  at one em, so badges with such text render readably and come out wider than before.
 
 ## What you get in addition
 

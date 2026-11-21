@@ -40,14 +40,14 @@ def _rectangle(width):
     return pen.glyph()
 
 
-def build_test_font(path):
-    """Write a TrueType font supporting CHARACTERS to `path`."""
+def build_test_font(path, characters=CHARACTERS):
+    """Write a TrueType font supporting `characters` to `path`."""
     widths = {".notdef": 500}
-    widths.update(dict(CHARACTERS.values()))
+    widths.update(dict(characters.values()))
 
     builder = FontBuilder(1000, isTTF=True)
     builder.setupGlyphOrder(list(widths))
-    builder.setupCharacterMap({ord(c): name for c, (name, _) in CHARACTERS.items()})
+    builder.setupCharacterMap({ord(c): name for c, (name, _) in characters.items()})
     builder.setupGlyf({name: _rectangle(width) for name, width in widths.items()})
     builder.setupHorizontalMetrics({name: (width, 0) for name, width in widths.items()})
     builder.setupHorizontalHeader(ascent=800, descent=-200)
