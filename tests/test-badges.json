@@ -87,7 +87,7 @@
     "file_name": "embedded-logo.svg",
     "left_text": "--embed-logo",
     "right_text": "yes",
-    "logo": "https://dev.w3.org/SVG/tools/svgweb/samples/svg-files/python.svg",
+    "logo": "<embedded>",
     "embed_logo": true
   },
   {

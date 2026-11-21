@@ -26,7 +26,7 @@ from tests import test_badgepy
 
 
 def generate_images(source_json_path, target_directory):
-    srv = image_server.ImageServer(test_badgepy.PNG_IMAGE)
+    srv = image_server.ImageServer(test_badgepy.SVG_LOGO, "image/svg+xml")
     srv.start_server()
     try:
         os.makedirs(target_directory, exist_ok=True)
